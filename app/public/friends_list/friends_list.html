@@ -1,0 +1,25 @@
+<form class="form-horizontal">
+  <div class="form-group">
+    <div class="col-sm-11">
+      <!-- BIND THIS VALUE TO formData.text IN ANGULAR -->
+      <input type="text" class="form-control input-lg text-center"
+             placeholder="Znajdz przyjaciol" ng-model="search_id">
+    </div>
+    <!-- createToDo() WILL CREATE NEW TODOS -->
+    <button type="submit" class="btn btn-primary btn-lg" ng-click="get()">Szukaj</button>
+  </div>
+</form>
+
+<ul class="media-list">
+  <li class="media thumbnail" ng-repeat="profile in friends_list" ng-click="goToProfile(profile)">
+    <div class="media-left col-sm-3 col-md-1" >
+      <a>
+        <img class="media-object" ng-src="{{profile.photo}}" alt="...">
+      </a>
+    </div>
+    <div class="media-body">
+      <h3 class="media-heading">{{profile.doc.full_name}}</h3>
+      <h4 class="media-heading">{{profile.doc.torrent_id}}</h4>
+    </div>
+  </li>
+</ul>

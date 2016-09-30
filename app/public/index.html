@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp" class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Magisterka</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/bower_components/angular-bootstrap/ui-bootstrap-csp.css">
+
+    <link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="clearfix">
+    <div ng-include="'menu/menu.html'"></div>
+</header>
+<section id="content" class="content">
+    <div>
+        <ui-view></ui-view>
+    </div>
+</section>
+<script src="/bower_components/angular/angular.js"></script>
+<script src="/angular-ui-router/release/angular-ui-router.js"></script>
+<script src="/bower_components/angular-route/angular-route.js"></script>
+<script src="/bower_components/flow.js/dist/flow.js"></script>
+<script src="/bower_components/ng-flow/dist/ng-flow-standalone.js"></script>
+<script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+
+
+<script src="app.js"></script>
+<script src="home/home.js"></script>
+<script src="profile/profile.js"></script>
+<script src="profil_uzytkownika/profil_uzytkownika.js"></script>
+<script src="friends_list/friends_list.js"></script>
+<script src="services/photos.js"></script>
+<script src="services/posts.js"></script>
+<script src="services/profiles.js"></script>
+<script src="profil_uzytkownika/uploader/uploader.component.js"></script>
+<script src="profil_uzytkownika/albums/albums.component.js"></script>
+<script src="profil_uzytkownika/details/details.component.js"></script>
+<script src="profil_uzytkownika/posts/posts.component.js"></script>
+</body>
+</html>

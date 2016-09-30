@@ -1,0 +1,41 @@
+
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label for="praca" class="col-sm-3 control-label">Praca</label>
+
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="praca" placeholder="Stanowisko"
+                               data-ng-model="$ctrl.profile.job">
+                    </div>
+                    <label for="plec" class="col-sm-3 control-label">Plec</label>
+
+                    <div id="plec" class="col-sm-3">
+                        <select data-ng-model="$ctrl.profile.sex" class="form-control">
+                            <option>Kobieta</option>
+                            <option>Mezczyzna</option>
+                        </select>
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <label for="zamieszkanie" class="col-sm-3 control-label">Miejsce zamieszkania</label>
+
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="zamieszkanie" placeholder="Miejsce zamieszkania"
+                               data-ng-model="$ctrl.profile.live">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="data" class="col-sm-3 control-label">Data urodzenia</label>
+
+                    <div class="col-sm-3">
+                        <input type="date" class="form-control" id="data" placeholder="Data urodzenia"
+                               data-ng-model="$ctrl.profile.born_date">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-10 col-sm-3">
+                        <button type="submit" class="btn btn-default" ng-click="$ctrl.saveProfile()">Zapisz</button>
+                    </div>
+                </div>
+            </form>

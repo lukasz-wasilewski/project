@@ -1,0 +1,41 @@
+<div>
+    <div class="jumbotron">
+        <div class="row">
+            <div class="col-sm-4">
+                <div flow-init
+                     flow-files-submitted="$flow.upload()"
+                     flow-file-added="!!{png:1,gif:1,jpg:1,jpeg:1}[$file.getExtension()]"
+                     flow-file-success="upload_profile( $file, $message, $flow )">
+                    <div class="drop" flow-drop ng-class="dropClass">
+                        <div class="thumbnail" style="height: 250px; width: 250px" flow-btn>
+                            <img src="{{photo}}" flow-img="$flow.files[0]" style="height: 240px; width: 250px"/>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <h1>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control input-lg" id="imie" placeholder="Nazwisko i imie"
+                           data-ng-model="profile.full_name">
+                </div>
+
+                <div class="col-sm-5">
+                    <input type="text" class="form-control input-lg" id="torrent" placeholder="Loading... torrent hash"
+                           data-ng-model="profile.torrent_id" disabled="disabled">
+                </div>
+            </h1>
+        </div>
+    </div>
+    
+<ul class="nav nav-tabs">
+  <li ui-sref-active="active"><a ui-sref="profil_uzytkownika.details">Szczegoly</a></li>
+<li ui-sref-active="active"><a ui-sref="profil_uzytkownika.posts">Posty</a></li>
+<li ui-sref-active="active"><a ui-sref="profil_uzytkownika.albums">Albumy</a></li>
+<li ui-sref-active="active"><a ui-sref="profil_uzytkownika.uploader">Dodaj Zdjecia</a></li>
+</ul>
+
+    <br/>
+    <ui-view></ui-view>
+
+</div>
