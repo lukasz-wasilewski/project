@@ -17,7 +17,8 @@ module.exports = function() {
         putPhoto,
         getPost,
         putPost,
-        getAllUsers
+        getAllUsers,
+        getAllDocs
     }
 
     function getUserGuid() {
@@ -31,15 +32,17 @@ module.exports = function() {
                     publicKey: kp.publicKey.toString('hex'),
                     secretKey: kp.secretKey.toString('hex')
                 };
-                db.put({
+                var result = {
                     _id: 'app_guid',
                     value: guid.raw(),
                     keypair: keypair
-                }).then(function(posts) {
+                };
+                db.put(result).then(function(posts) {
                     console.log(posts);
                 }).catch(function(err) {
                     console.log(err);
                 });
+                return result;
             });
     }
 
@@ -61,6 +64,44 @@ module.exports = function() {
                 startkey: "profile_",
                 endkey: 'profile_\uffff', binary:true
             })
+    }
+
+    function getAllDocs(userGuid) {
+        var result = {};
+        return getUser(userGuid)
+            .then(function(profile){
+                result.profile = profile;
+            })
+            .catch(function(err) {
+                console.log(err);
+            })
+            .then(function(){
+                return getPost(userGuid);
+            })
+            .then(function(posts){
+                posts = posts.rows.map(function(val) {
+                    return val.doc;
+                });
+                result.posts = posts;
+            })
+            .catch(function(err) {
+                console.log(err);
+            })
+            .then(function(){
+                return getPhoto(userGuid);
+            })
+            .then(function(photos){
+                photos = photos.rows.map(function(val) {
+                    return val.doc;
+                });
+                result.photos = photos;
+            })
+            .catch(function(err) {
+                console.log(err);
+            })
+            .then(function(){
+                return result;
+            });
     }
 
     function putUser(user) {

@@ -6,7 +6,8 @@
         templateUrl: 'profil_uzytkownika/albums/albums.html',
         controller: ProfilUzytkownikaCtrl,
         bindings: {
-            photos: '<'
+            photos: '<',
+            post: '<'
         }
     });
 

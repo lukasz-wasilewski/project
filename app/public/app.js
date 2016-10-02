@@ -13,34 +13,9 @@
             component: 'homeComponent'
         });
         $stateProvider.state({
-            name: 'profil_uzytkownika',
-            url:'/profil_uzytkownika',
-            component: 'profilUzytkownikaComponent'
-        });
-        $stateProvider.state({
-            name: 'profil_uzytkownika.details',
-            url:'/details',
-            template: '<details-component profile="profile" post="post"></details-component>'
-        });
-        $stateProvider.state({
-            name: 'profil_uzytkownika.posts',
-            url:'/posts',
-            template: '<posts-component post="post" posts="posts"></posts-component>'
-        });
-        $stateProvider.state({
-            name: 'profil_uzytkownika.albums',
-            url:'/albums',
-            template: '<albums-component photos="photos"></albums-component>'
-        });
-        $stateProvider.state({
-            name: 'profil_uzytkownika.uploader',
-            url:'/uploader',
-            template: '<uploader-component post="post"></uploader-component>'
-        });
-        $stateProvider.state({
             name: 'profile',
             url:'/profile/{personId}',
-            component: 'profileComponent',
+            component: 'profilUzytkownikaComponent',
             resolve: {
                 id: function( $transition$) {
                     console.log($transition$.params().personId);

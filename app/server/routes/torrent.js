@@ -3,17 +3,15 @@ var DHT = require('bittorrent-dht')
 var WebTorrent = require('webtorrent');
 var crypto = require('crypto')
 var ed = require('ed25519-supercop')
-module.exports = function(app, db, client) {
+module.exports = function (app, db, client) {
 
-    app.post('/share', function(req, res) {
+    app.post('/share', function (req, res) {
         console.log(req.body);
-
         share(res);
     });
 
-    app.post('/upload/:user_id', function(req, res) {
+    app.post('/upload/:user_id', function (req, res) {
         console.log(req.params.user_id);
-
         runConsume(req.params.user_id, res);
     });
 
@@ -28,11 +26,11 @@ module.exports = function(app, db, client) {
         console.log(hash);
 
         var torrent = client.add(hash);
-        torrent.on('done', function() {
-            torrent.files.forEach(function(file) {
+        torrent.on('done', function () {
+            torrent.files.forEach(function (file) {
                 // Get a url for each file
                 console.log(file);
-                file.getBuffer(function(err, buffer) {
+                file.getBuffer(function (err, buffer) {
                     if (err) throw err;
                     var temp = JSON.parse(buffer.toString('utf-8'));
                     console.log(temp);
@@ -49,22 +47,22 @@ module.exports = function(app, db, client) {
                     }
                     if (temp.profile._attachments) {
                         for (data in temp.profile._attachments) {
-                            new_user._attachments[data]= {
-                                    "data": new Buffer(temp.profile._attachments[data].data.toString('base64')),
-                                    contentType: temp.profile._attachments[data].content_type
-                                
+                            new_user._attachments[data] = {
+                                "data": new Buffer(temp.profile._attachments[data].data.toString('base64')),
+                                contentType: temp.profile._attachments[data].content_type
+
                             };
                         }
                     }
-                    db.db.get("profile_" + temp.profile._id).then(function(p) {
+                    db.db.get("profile_" + temp.profile._id).then(function (p) {
                         new_user._rev = p._rev;
                         db.db.put(new_user);
-                    }).catch(function() {
+                    }).catch(function () {
                         db.db.put(new_user);
                     });
 
                     client.destroy();
-                    
+
 
 
                 });
@@ -81,60 +79,29 @@ module.exports = function(app, db, client) {
         client.destroy();
         client = new WebTorrent();
         var data = {};
-        db.getUser()
-            .then(function(profile) {
-                console.log(profile);
-                db.getUserGuid()
-                    .then(function(guid) {
-                        console.log(guid);
-                        db.getPhoto(guid.value)
-                            .then(function(photos) {
-                                photos = photos.rows.map(function(val) {
-                                    return val.doc;
-                                });
-                                db.getPost(guid.value)
-                                    .then(function(posts) {
-                                        posts = posts.rows.map(function(val) {
-                                            return val.doc;
-                                        });
-                                        var data = {
-                                            profile,
-                                            photos,
-                                            posts
-                                        };
-                                        console.log('Torrent info hash:', data)
-                                        var fileBuffer = new Buffer(JSON.stringify(data));
-                                        fileBuffer.name = profile.full_name;
+        db.getUserGuid()
+            .then(function (guid) {
+                console.log(guid);
+                db.getAllDocs(guid.value).then(function (data) {
+                    console.log('Torrent info hash:', data);
+                    var fileBuffer = new Buffer(JSON.stringify(data));
+                    fileBuffer.name = data.profile.full_name;
 
-                                        client.seed(fileBuffer, function onTorrent(torrent) {
-                                            // Client is seeding the file!
-                                            console.log('Torrent info hash:', torrent.magnetURI);
-                                            console.log(client);
-                                            runPublish(guid.keypair.publicKey, guid.keypair.secretKey, torrent.infoHash)
-                                            if (res) res.json(torrent.infoHash)
-                                                //storeHash(, guid, res)
+                    client.seed(fileBuffer, function onTorrent(torrent) {
+                        // Client is seeding the file!
+                        console.log('Torrent info hash:', torrent.magnetURI);
+                        console.log(client);
+                        runPublish(guid.keypair.publicKey, guid.keypair.secretKey, torrent.infoHash)
+                        if (res) res.json(torrent.infoHash)
 
-                                        });
-                                    }).catch(function(err) {
-                                        console.log(err);
-                                        if (res) res.status(404).send(err);
-                                    });
-                            })
-                            .catch(function(err) {
-                                console.log(err);
-                                if (res) res.status(404).send(err);
-                            });
-
-                    }).catch(function(err) {
-                        console.log(err);
-                        if (res) res.json(err);
                     });
+                });
 
-            })
-            .catch(function(err) {
+            }).catch(function (err) {
                 console.log(err);
                 if (res) res.json(err);
             });
+
     }
 
 
@@ -152,7 +119,7 @@ module.exports = function(app, db, client) {
         var dht = client.dht
 
         console.log('connecting to DHT... ')
-        dht.on('ready', function() {
+        dht.on('ready', function () {
 
             var opts = {
                 k: buffPubKey,
@@ -160,13 +127,13 @@ module.exports = function(app, db, client) {
                 v: {
                     ih: new Buffer(infoHash, 'hex')
                 },
-                sign: function(buf) {
+                sign: function (buf) {
                     return ed.sign(buf, buffPubKey, buffSecKey)
                 }
             }
 
             console.log('looking up target ID ' + targetID + ' ... ')
-            dht.get(targetID, function(err, res) {
+            dht.get(targetID, function (err, res) {
                 if (err || !res) {
                     console.log('{red:not found}')
                     publishSeq(0)
@@ -179,7 +146,7 @@ module.exports = function(app, db, client) {
                     opts.seq = seq
                     console.log('making request:')
                     console.log(opts)
-                    dht.put(opts, function(err, hash) {
+                    dht.put(opts, function (err, hash) {
                         if (err) console.log('{red:error publishing}')
                         if (hash) console.log('{green:done}')
                         client.destroy()
@@ -206,11 +173,11 @@ module.exports = function(app, db, client) {
         var dht = client.dht
 
         console.log('connecting to DHT... ')
-        dht.on('ready', function() {
+        dht.on('ready', function () {
 
             console.log('looking up target ID ' + targetID + ' ... ')
 
-            dht.get(targetID, function(err, res) {
+            dht.get(targetID, function (err, res) {
                 if (err || !res) {
                     console.log('{red:not found}')
                     response.json(err)

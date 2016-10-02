@@ -1,6 +1,6 @@
 <div>
     <div class="jumbotron">
-        <div class="row">
+        <div class="row" ng-if="$ctrl.editable">
             <div class="col-sm-4">
                 <div flow-init
                      flow-files-submitted="$flow.upload()"
@@ -8,7 +8,7 @@
                      flow-file-success="upload_profile( $file, $message, $flow )">
                     <div class="drop" flow-drop ng-class="dropClass">
                         <div class="thumbnail" style="height: 250px; width: 250px" flow-btn>
-                            <img src="{{photo}}" flow-img="$flow.files[0]" style="height: 240px; width: 250px"/>
+                            <img ng-src="{{photo}}" flow-img="$flow.files[0]" style="height: 240px; width: 250px"/>
                         </div>
                     </div>
                 </div>
@@ -26,16 +26,18 @@
                 </div>
             </h1>
         </div>
+         <div class="row" ng-if="!$ctrl.editable">
+            <div class="col-xs-6 col-md-3">
+                <img class="thumbnail" ng-src="{{photo}}" alt="" style="height: 250px; width: 250px">
+            </div>
+            <h1>{{profile.full_name}}</h1>
+        </div>
     </div>
     
-<ul class="nav nav-tabs">
-  <li ui-sref-active="active"><a ui-sref="profil_uzytkownika.details">Szczegoly</a></li>
-<li ui-sref-active="active"><a ui-sref="profil_uzytkownika.posts">Posty</a></li>
-<li ui-sref-active="active"><a ui-sref="profil_uzytkownika.albums">Albumy</a></li>
-<li ui-sref-active="active"><a ui-sref="profil_uzytkownika.uploader">Dodaj Zdjecia</a></li>
-</ul>
-
-    <br/>
-    <ui-view></ui-view>
+<uib-tabset active="activeJustified" justified="true">
+    <uib-tab index="0" heading="Details"><details-component profile="profile" post="post" editable="$ctrl.editable"></details-component></uib-tab>
+    <uib-tab index="1" heading="Posts"><posts-component posts="posts" post="post" editable="$ctrl.editable"></posts-component></uib-tab>
+    <uib-tab index="2" heading="Photos"><albums-component photos="photos" post="post" editable="$ctrl.editable"></albums-component></uib-tab>
+  </uib-tabset>
 
 </div>

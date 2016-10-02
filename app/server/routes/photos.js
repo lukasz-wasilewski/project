@@ -1,3 +1,4 @@
+var utils = require('./utils')();
 module.exports = function(app, db) {
 
     app.get('/photos/:user_id', function(req, res) {
@@ -89,42 +90,17 @@ module.exports = function(app, db) {
 
     // create todo and send back all todos after creation
     app.post('/photos/save', function(req, res) {
-        var new_photo = {
-            files: {}
-        };
-
-        req.pipe(req.busboy);
-        req.busboy.on('field', function(fieldname, val) {
-            console.log('Field [' + fieldname + ']: value: ' + val);
-            new_photo[fieldname] = val;
-        });
-        req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-            console.log("Uploading: " + filename);
-            var fileBuffer = new Buffer('');
-            //Path where image will be uploaded
-            file.on('data', function(data) {
-                console.log('File [' + filename + '] got ' + data.length + ' bytes');
-                fileBuffer = Buffer.concat([fileBuffer, data]);
-            });
-
-            file.on('end', function() {
-                console.log('File [' + filename + '] Finished');
-                new_photo.files[filename] = {
-                    buffer: fileBuffer,
-                    type: mimetype,
-                    filename: filename
-                };
-            });
-        });
+        var newFile = {};
+        utils.getFileFromRequest(req, newFile)
         req.busboy.on('finish', function() {
             console.log('Done parsing form!');
             var album = {
-                text: new_photo.text,
-                album: new_photo.album,
+                text: newFile.text,
+                album: newFile.album,
                 _attachments: {}
             }
-            for (var file_name in new_photo.files) {
-                var file_data = new_photo.files[file_name];
+            for (var file_name in newFile.files) {
+                var file_data = newFile.files[file_name];
                 album._attachments[file_name] = {
                     content_type: file_data.type,
                     data: file_data.buffer,

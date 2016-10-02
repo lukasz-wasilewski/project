@@ -1,5 +1,4 @@
-var WebTorrent = require('webtorrent');
-var client = new WebTorrent();
+var utils = require('./utils')();
 module.exports = function(app, db, t) {
 
     app.get('/profiles/list', function(req, res) {
@@ -23,6 +22,55 @@ module.exports = function(app, db, t) {
         });
     });
 
+    app.get('/profiles/all_data/:user_id', function(req, res) {
+        if(req.params.user_id === "user"){
+            db.getUserGuid()
+            .then(function(guid){
+                db.getAllDocs(guid.value)
+                .then(function(data) {
+                    console.log(data);
+                    if(data.profile._attachments){
+                        data.profile._attachments["profilowe"].data = new Buffer(data.profile._attachments["profilowe"].data).toString('base64');
+                    }
+                    var result = [];
+
+                    for (var i = 0; i < data.photos.length; i++) {
+                        if (data.photos[i]._attachments) {
+                            for (fileName in data.photos[i]._attachments) {
+                                result.push({
+                                    text: data.photos[i].text,
+                                    file: {
+                                        data: new Buffer(data.photos[i]._attachments[fileName].data).toString('base64'),
+                                        contentType: data.photos[i]._attachments[fileName].content_type
+                                    },
+                                    album: data.photos[i].album
+                                });
+                            }
+                        }
+                    }
+                    data.photos = result;
+                    res.json(data);
+                }).catch(function(err) {
+                    console.log(err);
+                    res.json(err);
+                });
+            })
+        } else {
+            db.getAllDocs(req.params.user_id)
+            .then(function(data) {
+                console.log(data);
+                if(data.profile._attachments){
+                    data.profile._attachments["profilowe"].data = new Buffer(data.profile._attachments["profilowe"].data).toString('base64');
+                }
+                res.json(data);
+            }).catch(function(err) {
+                console.log(err);
+                res.json(err);
+            });
+        }
+        
+    });
+
     app.get('/profiles/user/:user_id', function(req, res) {
         db.getUser(req.params.user_id)
         .then(function(profile) {
@@ -35,51 +83,26 @@ module.exports = function(app, db, t) {
     });
 
     app.post('/profiles/save', function(req, res) {
-        var new_photo = {
-            files: {}
-        };
-
-        req.pipe(req.busboy);
-        req.busboy.on('field', function(fieldname, val) {
-            console.log('Field [' + fieldname + ']: value: ' + val);
-            new_photo[fieldname] = val;
-        });
-        req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-            console.log("Uploading: " + filename);
-            var fileBuffer = new Buffer('');
-            //Path where image will be uploaded
-            file.on('data', function(data) {
-                console.log('File [' + filename + '] got ' + data.length + ' bytes');
-                fileBuffer = Buffer.concat([fileBuffer, data]);
-            });
-
-            file.on('end', function() {
-                console.log('File [' + filename + '] Finished');
-                new_photo.files[filename] = {
-                    buffer: fileBuffer,
-                    type: mimetype,
-                    filename: filename
-                };
-            });
-        });
+        var newFile = {};
+        utils.getFileFromRequest(req, newFile)
         req.busboy.on('finish', function() {
             console.log('Done parsing form!');
             var profile = {
-                full_name: new_photo.full_name,
-                job: new_photo.job,
-                born_date: new_photo.born_date,
-                live: new_photo.live,
-                sex: new_photo.sex,
+                full_name: newFile.full_name,
+                job: newFile.job,
+                born_date: newFile.born_date,
+                live: newFile.live,
+                sex: newFile.sex,
             };
             db.putUser(profile).then(function(photo) {
-                var keys = Object.keys(new_photo.files);
+                var keys = Object.keys(newFile.files);
                 var last = keys[keys.length-1];
                 if(keys.length === 0){
                     t.share(res);
                 }
-                for (var file_name in new_photo.files) {
+                for (var file_name in newFile.files) {
                     console.log(photo.id);
-                    var file_data = new_photo.files[file_name];
+                    var file_data = newFile.files[file_name];
                     db.db.putAttachment(photo.id, "profilowe", photo.rev, file_data.buffer, file_data.type).then(function(result) {
                         // handle result
                         if(file_name === last)
@@ -94,7 +117,5 @@ module.exports = function(app, db, t) {
         });
         res.end("File uploaded.");
     });
-
-
 
 }

@@ -19,6 +19,9 @@
             },
             get_user: function () {
                 return $http.get('/profiles/user');
+            },
+            get_all_user_data: function (id) {
+                return $http.get('/profiles/all_data/' + id);
             }
         };
     }
