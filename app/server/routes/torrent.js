@@ -1,5 +1,5 @@
 var DHT = require('bittorrent-dht')
-
+var _ = require('lodash');
 var WebTorrent = require('webtorrent');
 var crypto = require('crypto')
 var ed = require('ed25519-supercop')
@@ -16,7 +16,8 @@ module.exports = function (app, db, client) {
     });
 
     return {
-        share
+        share,
+        runConsume
     }
 
     function getTorrent(data, res) {
@@ -34,33 +35,44 @@ module.exports = function (app, db, client) {
                     if (err) throw err;
                     var temp = JSON.parse(buffer.toString('utf-8'));
                     console.log(temp);
-                    var new_user = {
-                        _id: "profile_" + temp.profile._id,
-                        full_name: temp.profile.full_name,
-                        job: temp.profile.job,
-                        born_date: temp.profile.born_date,
-                        live: temp.profile.live,
-                        sex: temp.profile.sex,
-                        torrent_id: temp.profile.torrent_id,
-                        _attachments: {},
-                        is_user: false
-                    }
+                    temp.profile._id = "profile_" + temp.profile._id;
                     if (temp.profile._attachments) {
                         for (data in temp.profile._attachments) {
-                            new_user._attachments[data] = {
-                                "data": new Buffer(temp.profile._attachments[data].data.toString('base64')),
-                                contentType: temp.profile._attachments[data].content_type
-
-                            };
+                            temp.profile._attachments[data].data = new Buffer(temp.profile._attachments[data].data, 'base64')
                         }
                     }
-                    db.db.get("profile_" + temp.profile._id).then(function (p) {
-                        new_user._rev = p._rev;
-                        db.db.put(new_user);
+                    console.log(temp.profile._id);
+                    db.db.get(temp.profile._id).then(function (p) {
+                        temp.profile._rev = p._rev;
+                        db.db.put(temp.profile);
                     }).catch(function () {
-                        db.db.put(new_user);
+                        delete temp.profile._rev;
+                        db.db.put(temp.profile);
                     });
-
+                    db.getPost(temp.profile._id).then(function(p){
+                        for(post of temp.posts){
+                            if(!_.some(p.rows,  function(row){return row.doc.text === post.text})){
+                                delete post._rev;
+                                db.putPost(post, temp.profile._id);
+                            }
+                        }
+                    });
+                        
+                    
+                    db.getPhoto(temp.profile._id).then(function(p){
+                        
+                        for(photo of temp.photos) {
+                            console.log(p);
+                            if(!_.some(p.rows,  function(row){
+                                return row.doc.album === photo.album})){
+                                delete photo._rev;
+                                db.putPhoto(photo, temp.profile._id);
+                            }
+                            
+                        }
+                    })
+                    
+                    
                     client.destroy();
 
 
@@ -70,9 +82,25 @@ module.exports = function (app, db, client) {
 
             });
         })
-        res.json({
-            "status": "success"
-        });
+        if(res) res.json({ "status": "success"});
+    }
+
+    function changeAttachementsToString(data) {
+        if (data && data._attachments) {
+            for (fileName in data._attachments) {
+                data._attachments[fileName].data = new Buffer(data._attachments[fileName].data).toString('base64');
+            }
+        }
+    }
+
+    function prepareForTorrent(data){
+        changeAttachementsToString(data.profile);
+        for(post of data.posts){
+            changeAttachementsToString(post);
+        }
+        for(photo of data.photos) {
+            changeAttachementsToString(photo);
+        }
     }
 
     function share(res) {
@@ -83,7 +111,10 @@ module.exports = function (app, db, client) {
             .then(function (guid) {
                 console.log(guid);
                 db.getAllDocs(guid.value).then(function (data) {
+                    if(data.profile) {
+                    prepareForTorrent(data);
                     console.log('Torrent info hash:', data);
+
                     var fileBuffer = new Buffer(JSON.stringify(data));
                     fileBuffer.name = data.profile.full_name;
 
@@ -95,6 +126,7 @@ module.exports = function (app, db, client) {
                         if (res) res.json(torrent.infoHash)
 
                     });
+                    }
                 });
 
             }).catch(function (err) {
@@ -180,7 +212,7 @@ module.exports = function (app, db, client) {
             dht.get(targetID, function (err, res) {
                 if (err || !res) {
                     console.log('{red:not found}')
-                    response.json(err)
+                    if(response) response.json(err)
                     client.destroy();
                 } else {
                     console.log('response:')

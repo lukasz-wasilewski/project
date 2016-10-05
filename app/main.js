@@ -15,7 +15,8 @@ function createWindow() {
 
     let win = new BrowserWindow({
         width: 400,
-        height: 400
+        height: 400,
+        show: false
     })
     win.loadURL(`file://${__dirname}/../invisible.html`)
     win.webContents.openDevTools()
@@ -34,13 +35,13 @@ const ipc = require('electron').ipcMain;
         // and load the index.html of the app.
         mainWindow.loadURL('http://localhost:8080/');
         // Open the DevTools.
-        mainWindow.webContents.openDevTools()
 
         // Emitted when the window is closed.
         mainWindow.on('closed', function() {
             // Dereference the window object, usually you would store windows
             // in an array if your app supports multi windows, this is the time
             // when you should delete the corresponding element.
+            app.quit()
             mainWindow = null
         })
     })

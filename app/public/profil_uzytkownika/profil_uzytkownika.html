@@ -35,9 +35,10 @@
     </div>
     
 <uib-tabset active="activeJustified" justified="true">
-    <uib-tab index="0" heading="Details"><details-component profile="profile" post="post" editable="$ctrl.editable"></details-component></uib-tab>
-    <uib-tab index="1" heading="Posts"><posts-component posts="posts" post="post" editable="$ctrl.editable"></posts-component></uib-tab>
-    <uib-tab index="2" heading="Photos"><albums-component photos="photos" post="post" editable="$ctrl.editable"></albums-component></uib-tab>
+    <uib-tab index="0" heading="Szczegoly"><details-component profile="profile" post="post" editable="$ctrl.editable"></details-component></uib-tab>
+    <uib-tab index="1" heading="Posty"><posts-component posts="posts" post="post" editable="$ctrl.editable"></posts-component></uib-tab>
+    <uib-tab index="2" heading="Albumy"><albums-component photos="photos" post="post"></albums-component></uib-tab>
+    <uib-tab index="3" heading="Zdjecia" ng-if="$ctrl.editable"><uploader-component post="post"></uploader-component></uib-tab>
   </uib-tabset>
 
 </div>

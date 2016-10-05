@@ -1,16 +1,16 @@
-
+<br />
             <form class="form-horizontal">
                 <div class="form-group">
                     <label for="praca" class="col-sm-3 control-label">Praca</label>
 
                     <div class="col-sm-3">
                         <input type="text" class="form-control" id="praca" placeholder="Stanowisko"
-                               data-ng-model="$ctrl.profile.job">
+                               data-ng-model="$ctrl.profile.job" ng-disabled="!$ctrl.editable">
                     </div>
                     <label for="plec" class="col-sm-3 control-label">Plec</label>
 
                     <div id="plec" class="col-sm-3">
-                        <select data-ng-model="$ctrl.profile.sex" class="form-control">
+                        <select data-ng-model="$ctrl.profile.sex" class="form-control" ng-disabled="!$ctrl.editable">
                             <option>Kobieta</option>
                             <option>Mezczyzna</option>
                         </select>
@@ -22,7 +22,7 @@
 
                     <div class="col-sm-3">
                         <input type="text" class="form-control" id="zamieszkanie" placeholder="Miejsce zamieszkania"
-                               data-ng-model="$ctrl.profile.live">
+                               data-ng-model="$ctrl.profile.live" ng-disabled="!$ctrl.editable">
                     </div>
                 </div>
                 <div class="form-group">
@@ -30,10 +30,10 @@
 
                     <div class="col-sm-3">
                         <input type="date" class="form-control" id="data" placeholder="Data urodzenia"
-                               data-ng-model="$ctrl.profile.born_date">
+                               data-ng-model="$ctrl.profile.born_date" ng-disabled="!$ctrl.editable">
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" ng-if="$ctrl.editable">
                     <div class="col-sm-offset-10 col-sm-3">
                         <button type="submit" class="btn btn-default" ng-click="$ctrl.saveProfile()">Zapisz</button>
                     </div>

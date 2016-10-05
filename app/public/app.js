@@ -17,9 +17,12 @@
             url:'/profile/{personId}',
             component: 'profilUzytkownikaComponent',
             resolve: {
-                id: function( $transition$) {
+                id: function($transition$) {
                     console.log($transition$.params().personId);
                     return $transition$.params().personId;
+                },
+                editable: function($transition$) {
+                    return $transition$.params().personId === "user";
                 }
             }
         });

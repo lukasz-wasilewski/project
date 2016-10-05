@@ -6,7 +6,8 @@
             templateUrl: 'profil_uzytkownika/profil_uzytkownika.html',
             controller: ProfilUzytkownikaCtrl,
             bindings: {
-                id: '<'
+                id: '<',
+                editable: '<'
             }
         });
 
@@ -14,7 +15,7 @@
         var ctrl = this;
 
         ctrl.$onInit = function () {
-            ctrl.editable = false;
+            
             $scope.getNewPost = function () {
                 return {
                     text: "",

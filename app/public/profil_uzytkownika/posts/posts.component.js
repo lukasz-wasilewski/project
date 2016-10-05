@@ -7,7 +7,8 @@
         controller: ProfilUzytkownikaCtrl,
         bindings: {
             post: "<",
-            posts: "<"
+            posts: "<",
+            editable: '<'
         }
     });
 

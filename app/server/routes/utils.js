@@ -1,7 +1,27 @@
 
 module.exports = function () {
     return {
-        getFileFromRequest
+        getFileFromRequest,
+        prepareAttachementsDataFromDB
+    }
+
+    function prepareAttachementsDataFromDB(row) {
+        var result = [];
+        
+        if (row._attachments) {
+            for (fileName in row._attachments) {
+                var file = row._attachments[fileName];
+                result.push({
+                    text: row.text,
+                    file: {
+                        data: new Buffer(file.data).toString('base64'),
+                        contentType: file.content_type
+                    },
+                    album: row.album
+                });
+            }
+        }
+        return result;
     }
 
     function getFileFromRequest(req, newFile){

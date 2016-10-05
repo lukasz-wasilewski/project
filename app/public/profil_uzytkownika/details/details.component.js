@@ -8,7 +8,8 @@
         bindings: {
             profile: '=',
             post: '=',
-            profile_photo: '='
+            profile_photo: '=',
+            editable: '<'
         }
     });
 

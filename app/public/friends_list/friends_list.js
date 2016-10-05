@@ -12,13 +12,7 @@
             .success(function (data) {
                 $scope.friends_list = data;
                 for(var i = 0; i < data.length; i++) {
-                    Photos.get(data[i]._id, "actual_photo").success(function(data) {
-                        if(data.length > 0) {
-                            data[0].file.data = "data:" + data[0].file.contentType + ";base64, " + data[0].file.data;
-                            var user = $filter('filter')($scope.friends_list, function (d) {return d.id === data.user;})[0];
-                            user.photo = data[0].file.data;
-                        }
-                    });
+                    data[i].photo = "data:" + data[i].doc._attachments["profilowe"].content_type + ";base64," + data[i].doc._attachments["profilowe"].data;
                 }
             });
         $scope.search_id = "";

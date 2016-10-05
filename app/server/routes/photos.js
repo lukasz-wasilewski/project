@@ -28,7 +28,7 @@ module.exports = function(app, db) {
             });
     });
 
-    app.post('/photos/user', function(req, res) {
+    app.get('/photos/user', function(req, res) {
         db.getPhoto()
             .then(function(photos) {
                 photos = photos.rows.map(function(val) {
@@ -38,18 +38,7 @@ module.exports = function(app, db) {
                 var result = [];
 
                 for (var i = 0; i < photos.length; i++) {
-                    if (photos[i]._attachments) {
-                        for (data in photos[i]._attachments) {
-                            result.push({
-                                text: photos[i].text,
-                                file: {
-                                    data: new Buffer(photos[i]._attachments[data].data).toString('base64'),
-                                    contentType: photos[i]._attachments[data].content_type
-                                },
-                                album: photos[i].album
-                            });
-                        }
-                    }
+                    result.concat(utils.prepareAttachementsDataFromDB(data.photos[i]));
                 }
 
                 res.json(result);

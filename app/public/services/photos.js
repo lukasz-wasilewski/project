@@ -12,7 +12,7 @@
                 return $http.get('/photos/' + id);
             },
             get_all_user: function () {
-                return $http.post('/photos/user');
+                return $http.get('/photos/user');
             },
             save: function (photo) {
                 var xhr = new XMLHttpRequest();
