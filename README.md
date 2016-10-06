@@ -1,5 +1,6 @@
 # P2P social network application based on webtorrent
 > Tech stack: Electron, PouchDB, Webtorrent, Express, AngularJS
+
 To start project type command:
 `npm start`
 
