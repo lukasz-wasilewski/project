@@ -1,4 +1,4 @@
-# P2P social media application
+# P2P social network application based on webtorrent
 To start project type command:
 npm start
 
