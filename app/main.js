@@ -15,7 +15,8 @@ function createWindow() {
 
     let win = new BrowserWindow({
         width: 400,
-        height: 400
+        height: 400,
+        show: false
     })
     win.loadURL('file://' + __dirname + '/../invisible.html')
     win.webContents.openDevTools()
