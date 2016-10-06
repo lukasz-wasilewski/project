@@ -22,7 +22,6 @@
     "method-override": "~2.1.2",
     "morgan": "~1.2.2",
     "pouchdb-browser": "^6.0.4",
-    "pouchdb-find": "^0.10.3",
     "webtorrent": "^0.97.2"
   }
 }

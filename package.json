@@ -2,6 +2,10 @@
   "build": {
     "appId": "com.electron.magisterka",
     "category": "public.app-category.developer-tools",
+    "extraResources": [
+      "invisible.html",
+      "app/server/server.js"
+    ],
     "win": {
       "iconUrl": "http://image.flaticon.com/icons/svg/95/95214.svg"
     }
@@ -28,6 +32,7 @@
     "karma-firefox-launcher": "^0.1.6",
     "karma-jasmine": "^0.3.5",
     "karma-junit-reporter": "^0.2.2",
+    "path": "^0.12.7",
     "protractor": "^2.1.0",
     "shelljs": "^0.2.6",
     "wiredep": "^4.0.0"
@@ -36,7 +41,7 @@
     "postinstall": "install-app-deps",
     "preinstall": "bower install",
     "prestart": "npm install",
-    "start": "gulp start",
+    "start": "electron app",
     "pack": "build --dir",
     "dist": "build",
     "pretest": "npm install",

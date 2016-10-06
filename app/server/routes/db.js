@@ -1,7 +1,6 @@
 
 var guid = require('guid');
 var PouchDB = require('pouchdb-browser');
-PouchDB.plugin(require('pouchdb-find'));
 var db = new PouchDB('app-users');
 var ed = require('ed25519-supercop')
 db.info().then(function(info) {
