@@ -1,5 +1,5 @@
 // server.js
-
+module.exports = function(done){
 // set up ========================
 var express = require('express');
 var app = express();                               // create our app w/ express
@@ -26,5 +26,6 @@ require('./routes')(app, client);
 app.listen(8080, function() {
     const ipc = require('electron').ipcRenderer;
     console.log("App listening on port 8080");
-    ipc.send('server-run', 'ping')
+    done();
 });
+}

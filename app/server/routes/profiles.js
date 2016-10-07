@@ -105,8 +105,6 @@ module.exports = function (app, db, t) {
                         }
                     });
                 });
-
-        res.end("File uploaded.");
     });
 
 }

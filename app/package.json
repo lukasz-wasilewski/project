@@ -19,9 +19,11 @@
     "electron-reload": "^1.0.2",
     "express": "~4.7.2",
     "guid": "0.0.12",
+    "homedir": "^0.6.0",
     "method-override": "~2.1.2",
     "morgan": "~1.2.2",
-    "pouchdb-browser": "^6.0.4",
+    "pouchdb": "^6.0.6",
     "webtorrent": "^0.97.2"
-  }
+  },
+  "devDependencies": {}
 }

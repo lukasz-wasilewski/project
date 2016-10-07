@@ -1,7 +1,15 @@
 
 var guid = require('guid');
-var PouchDB = require('pouchdb-browser');
-var db = new PouchDB('app-users');
+var PouchDB = require('pouchdb');
+var homedir = require('homedir');
+const path = require('path');
+var fs = require('fs');
+var dir = './tmp';
+var dbPath = homedir() + path.sep+'app-users';
+if (!fs.existsSync(dbPath)){
+    fs.mkdirSync(dbPath);
+}
+var db = new PouchDB(dbPath+path.sep+'my.db');
 var ed = require('ed25519-supercop')
 db.info().then(function(info) {
     console.log(info);

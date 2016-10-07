@@ -11,21 +11,7 @@ require('electron-reload')(__dirname, {
     ignored: /app-users|node_modules|[\/\\]\./
 });
 
-function createWindow() {
-
-    let win = new BrowserWindow({
-        width: 400,
-        height: 400,
-        show: false
-    })
-    win.loadURL('file://' + __dirname + '/../invisible.html')
-    win.webContents.openDevTools()
-        // Create the browser window.
-}
-
-const ipc = require('electron').ipcMain;
-
-    ipc.on('server-run', function(event) {
+function newWindow() {
      
         mainWindow = new BrowserWindow({
             'minWidth': 800,
@@ -44,7 +30,16 @@ const ipc = require('electron').ipcMain;
             app.quit()
             mainWindow = null
         })
-    })
+    }
+
+function createWindow() {
+
+    require('./server/server')(newWindow)
+        // Create the browser window.
+}
+
+
+    
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
