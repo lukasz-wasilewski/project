@@ -14,6 +14,11 @@
     function ProfilUzytkownikaCtrl($scope, $window, $http, Profiles, Posts, Photos, $q) {
         var ctrl = this;
 
+        ctrl.copyToClipboard = function() {
+            const {clipboard} = require('electron')
+            clipboard.writeText($scope.post.user)
+        }
+
         ctrl.$onInit = function () {
             
             $scope.getNewPost = function () {

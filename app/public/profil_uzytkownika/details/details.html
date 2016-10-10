@@ -1,41 +1,42 @@
 <br />
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <label for="praca" class="col-sm-3 control-label">Praca</label>
+<form class="form-horizontal" style="display: flex; flex-direction: column">
+    <div style="display: flex; align-items: center">
 
-                    <div class="col-sm-3">
-                        <input type="text" class="form-control" id="praca" placeholder="Stanowisko"
-                               data-ng-model="$ctrl.profile.job" ng-disabled="!$ctrl.editable">
-                    </div>
-                    <label for="plec" class="col-sm-3 control-label">Plec</label>
+        <div class="input-group" style="width: 350px">
+            <span class="input-group-addon" style="width: 150px">Praca</span>
+            <input type="text" class="form-control" id="praca" placeholder="Stanowisko" data-ng-model="$ctrl.profile.job" ng-disabled="!$ctrl.editable">
+        </div>
 
-                    <div id="plec" class="col-sm-3">
-                        <select data-ng-model="$ctrl.profile.sex" class="form-control" ng-disabled="!$ctrl.editable">
+        <div class="input-group" style="width: 400px">
+            <span class="input-group-addon" style="width: 200px">Miejsce zamieszkania</span>
+            <input type="text" class="form-control" id="zamieszkanie" placeholder="Miejsce zamieszkania" data-ng-model="$ctrl.profile.live"
+                ng-disabled="!$ctrl.editable">
+        </div>
+
+    </div>
+
+    <div class="input-group" style="width: 350px">
+        <span class="input-group-addon" style="width: 150px">Data urodzenia</span>
+        <input type="date" class="form-control" id="data" placeholder="Data urodzenia" data-ng-model="$ctrl.profile.born_date" ng-disabled="!$ctrl.editable">
+    </div>
+
+    <div class="input-group pull-right" style="width: 350px">
+        <span class="input-group-addon">Plec</span>
+        <span class="input-group-addon">
+                <select data-ng-model="$ctrl.profile.sex" 
+                class="form-control btn-group" 
+                ng-disabled="!$ctrl.editable">
                             <option>Kobieta</option>
                             <option>Mezczyzna</option>
                         </select>
-                    </div>
+            </span>
+    </div>
 
-                </div>
-                <div class="form-group">
-                    <label for="zamieszkanie" class="col-sm-3 control-label">Miejsce zamieszkania</label>
 
-                    <div class="col-sm-3">
-                        <input type="text" class="form-control" id="zamieszkanie" placeholder="Miejsce zamieszkania"
-                               data-ng-model="$ctrl.profile.live" ng-disabled="!$ctrl.editable">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="data" class="col-sm-3 control-label">Data urodzenia</label>
 
-                    <div class="col-sm-3">
-                        <input type="date" class="form-control" id="data" placeholder="Data urodzenia"
-                               data-ng-model="$ctrl.profile.born_date" ng-disabled="!$ctrl.editable">
-                    </div>
-                </div>
-                <div class="form-group" ng-if="$ctrl.editable">
-                    <div class="col-sm-offset-10 col-sm-3">
-                        <button type="submit" class="btn btn-default" ng-click="$ctrl.saveProfile()">Zapisz</button>
-                    </div>
-                </div>
-            </form>
+    <div ng-if="$ctrl.editable">
+        <div class="pull-right">
+            <button style="margin: 15px" type="submit" class="btn btn-default" ng-click="$ctrl.saveProfile()">Zapisz</button>
+        </div>
+    </div>
+</form>

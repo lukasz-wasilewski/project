@@ -1,44 +1,53 @@
 <div>
     <div class="jumbotron">
-        <div class="row" ng-if="$ctrl.editable">
-            <div class="col-sm-4">
-                <div flow-init
-                     flow-files-submitted="$flow.upload()"
-                     flow-file-added="!!{png:1,gif:1,jpg:1,jpeg:1}[$file.getExtension()]"
-                     flow-file-success="upload_profile( $file, $message, $flow )">
+        <div ng-if="$ctrl.editable" style="display: flex">
+            <div>
+                <div flow-init flow-files-submitted="$flow.upload()" flow-file-added="!!{png:1,gif:1,jpg:1,jpeg:1}[$file.getExtension()]"
+                    flow-file-success="upload_profile( $file, $message, $flow )">
                     <div class="drop" flow-drop ng-class="dropClass">
                         <div class="thumbnail" style="height: 250px; width: 250px" flow-btn>
-                            <img ng-src="{{photo}}" flow-img="$flow.files[0]" style="height: 240px; width: 250px"/>
+                            <img ng-src="{{photo}}" flow-img="$flow.files[0]" style="height: 240px; width: 250px" />
                         </div>
                     </div>
                 </div>
 
             </div>
-            <h1>
-                <div class="col-sm-3">
-                    <input type="text" class="form-control input-lg" id="imie" placeholder="Nazwisko i imie"
-                           data-ng-model="profile.full_name">
+            <div>
+                <div style="margin: 5px">
+                    <input type="text" class="form-control input-lg" id="imie" placeholder="Nazwisko i imie" data-ng-model="profile.full_name">
                 </div>
 
-                <div class="col-sm-5">
-                    <input type="text" class="form-control input-lg" id="torrent" placeholder="Loading... torrent hash"
-                           data-ng-model="profile.torrent_id" disabled="disabled">
+                <div class="input-group has-success">
+                    <span class="input-group-addon" id="basic-addon3">Torrent hash</span>
+                    <input type="text" class="form-control" id="torrent" placeholder="Loading..." data-ng-model="profile.torrent_id"
+                        disabled="disabled">
+                    <span class="input-group-btn">
+                        <button class="btn btn-info" ng-click="$ctrl.copyToClipboard()">Copy to clipboard</button>
+                    </span>
                 </div>
-            </h1>
+            </div>
         </div>
-         <div class="row" ng-if="!$ctrl.editable">
-            <div class="col-xs-6 col-md-3">
+        <div ng-if="!$ctrl.editable">
+            <div>
                 <img class="thumbnail" ng-src="{{photo}}" alt="" style="height: 250px; width: 250px">
             </div>
             <h1>{{profile.full_name}}</h1>
         </div>
     </div>
-    
-<uib-tabset active="activeJustified" justified="true">
-    <uib-tab index="0" heading="Szczegoly"><details-component profile="profile" post="post" editable="$ctrl.editable"></details-component></uib-tab>
-    <uib-tab index="1" heading="Posty"><posts-component posts="posts" post="post" editable="$ctrl.editable"></posts-component></uib-tab>
-    <uib-tab index="2" heading="Albumy"><albums-component photos="photos" post="post"></albums-component></uib-tab>
-    <uib-tab index="3" heading="Zdjecia" ng-if="$ctrl.editable"><uploader-component post="post"></uploader-component></uib-tab>
-  </uib-tabset>
+
+    <uib-tabset active="activeJustified" justified="true">
+        <uib-tab index="0" heading="Szczegoly">
+            <details-component profile="profile" post="post" editable="$ctrl.editable"></details-component>
+        </uib-tab>
+        <uib-tab index="1" heading="Posty">
+            <posts-component posts="posts" post="post" editable="$ctrl.editable"></posts-component>
+        </uib-tab>
+        <uib-tab index="2" heading="Albumy">
+            <albums-component photos="photos" post="post"></albums-component>
+        </uib-tab>
+        <uib-tab index="3" heading="Zdjecia" ng-if="$ctrl.editable">
+            <uploader-component post="post"></uploader-component>
+        </uib-tab>
+    </uib-tabset>
 
 </div>

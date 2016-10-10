@@ -35,3 +35,11 @@ body {
   padding-top: 55px;
   -webkit-font-smoothing: antialiased;
 }
+
+.input-group{
+  margin: 5px;
+}
+
+#todo-list {
+  margin: 0px 10px;
+}

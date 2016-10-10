@@ -4,7 +4,6 @@ var PouchDB = require('pouchdb');
 var homedir = require('homedir');
 const path = require('path');
 var fs = require('fs');
-var dir = './tmp';
 var dbPath = homedir() + path.sep+'app-users';
 if (!fs.existsSync(dbPath)){
     fs.mkdirSync(dbPath);
