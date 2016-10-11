@@ -2,8 +2,8 @@
 
 <div ng-switch on="$ctrl.album_view">
     <div ng-switch-when="">
-        <div>
-            <div ng-repeat="album in $ctrl.photos">
+        <div style="display: flex">
+            <div style="width: 250px; margin: 5px" ng-repeat="album in $ctrl.photos">
                 <div class="thumbnail" ng-click="$ctrl.setAlbum(album[0].album)">
                     <div class="caption">
                         <h3>{{album[0].album}}</h3>
@@ -19,11 +19,13 @@
             <div class="caption">
                 <h3>{{$ctrl.photos[$ctrl.album_view][0].album}}</h3>
             </div>
-            <div ng-repeat="photo in $ctrl.photos[$ctrl.album_view]">
-                <div class="thumbnail" ng-click="$ctrl.open($index)">
-                    <img ng-src="{{photo.file.data}}" style="height: 250px; width: 250px">
-                    <div class="caption">
-                        <h4>{{photo.text}}</h4>
+            <div style="display: flex">
+                <div style="width: 250px; margin: 5px" ng-repeat="photo in $ctrl.photos[$ctrl.album_view]">
+                    <div class="thumbnail" ng-click="$ctrl.open($index)">
+                        <img ng-src="{{photo.file.data}}" style="height: 250px; width: 250px">
+                        <div class="caption">
+                            <h4>{{photo.text}}</h4>
+                        </div>
                     </div>
                 </div>
             </div>

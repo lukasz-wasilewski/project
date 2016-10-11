@@ -14,23 +14,22 @@
                 <span class="btn btn-default" flow-btn flow-directory ng-show="$flow.supportDirectory">Dodaj folder zdjec</span>
             </div>
         </div>
-
-
         <br/>
 
-        <div>
+        <div style="display: flex; flex-wrap: wrap">
 
-            <div ng-repeat="file in $flow.files" class="gallery-box">
-                <span class="title">{{file.name}}</span>
+            <div style="width: 250px; margin: 5px" ng-repeat="file in $flow.files" class="gallery-box">
+
 
                 <div class="thumbnail">
                     <img flow-img="file" style="height: 250px; width: 250px" />
                 </div>
-                <div class="btn-group">
+                <div class="btn-group" style="display: flex;flex-direction: column;">
                     <a class="btn btn-xs btn-danger" ng-click="file.cancel()">
                                 Usun
                             </a>
                 </div>
+                <span class="title" style="word-wrap: break-word;">{{file.name}}</span>
             </div>
             <div class="clear"></div>
         </div>

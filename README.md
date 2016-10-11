@@ -2,6 +2,7 @@
 > Tech stack: Electron, PouchDB, Webtorrent, Express, AngularJS
 
 To start project type command:
+
 `npm install`
 
 `npm start`
