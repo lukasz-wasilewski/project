@@ -8,6 +8,13 @@
         });
                     
     function FriendsListCtrl($scope, $window, Profiles, $http, Photos, $filter, $location) {
+        var ctrl = this;
+
+        ctrl.copyFromClipboard = function() {
+            const {clipboard} = require('electron')
+            $scope.search_id = clipboard.readText();
+        }
+
         Profiles.get()
             .success(function (data) {
                 $scope.friends_list = data;

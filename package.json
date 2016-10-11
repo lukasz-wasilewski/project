@@ -40,7 +40,6 @@
   "scripts": {
     "postinstall": "install-app-deps && npm run rebuild-electron",
     "preinstall": "bower install",
-    "prestart": "npm install",
     "rebuild-electron": "npm rebuild --runtime=electron --target=1.2.5 --disturl=https://atom.io/download/atom-shell --build-from-source",
     "start": "electron app",
     "pack": "build --dir",

@@ -20,13 +20,13 @@ module.exports = function (app, db, client) {
         runConsume
     }
 
-    function getTorrent(data, res) {
+    function getTorrent(infoHash, res) {
         var client = new WebTorrent();
 
-        var hash = "magnet:?xt=urn:btih:" + data + "&dn=sfdfsd&tr=udp%3A%2F%2Fexodus.desync.com%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=wss%3A%2F%2Ftracker.webtorrent.io";
-        console.log(hash);
+        var magnetURI = 'magnet:?xt=urn:btih:' + infoHash + '&tr=udp%3A%2F%2Fexodus.desync.com%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=wss%3A%2F%2Ftracker.webtorrent.io';
+        console.log(magnetURI);
 
-        var torrent = client.add(hash);
+        var torrent = client.add(magnetURI);
         torrent.on('done', function () {
             torrent.files.forEach(function (file) {
                 // Get a url for each file
@@ -49,30 +49,33 @@ module.exports = function (app, db, client) {
                         delete temp.profile._rev;
                         db.db.put(temp.profile);
                     });
-                    db.getPost(temp.profile._id).then(function(p){
-                        for(post of temp.posts){
-                            if(!_.some(p.rows,  function(row){return row.doc.text === post.text})){
+                    db.getPost(temp.profile._id).then(function (p) {
+                        for (post of temp.posts) {
+                            if (!_.some(p.rows, function (row) {
+                                    return row.doc.text === post.text
+                                })) {
                                 delete post._rev;
                                 db.putPost(post, temp.profile._id);
                             }
                         }
                     });
-                        
-                    
-                    db.getPhoto(temp.profile._id).then(function(p){
-                        
-                        for(photo of temp.photos) {
+
+
+                    db.getPhoto(temp.profile._id).then(function (p) {
+
+                        for (photo of temp.photos) {
                             console.log(p);
-                            if(!_.some(p.rows,  function(row){
-                                return row.doc.album === photo.album})){
+                            if (!_.some(p.rows, function (row) {
+                                    return row.doc.album === photo.album
+                                })) {
                                 delete photo._rev;
                                 db.putPhoto(photo, temp.profile._id);
                             }
-                            
+
                         }
                     })
-                    
-                    
+
+
                     client.destroy();
 
 
@@ -82,7 +85,9 @@ module.exports = function (app, db, client) {
 
             });
         })
-        if(res) res.json({ "status": "success"});
+        if (res) res.json({
+            "status": "success"
+        });
     }
 
     function changeAttachementsToString(data) {
@@ -93,39 +98,38 @@ module.exports = function (app, db, client) {
         }
     }
 
-    function prepareForTorrent(data){
+    function prepareForTorrent(data) {
         changeAttachementsToString(data.profile);
-        for(post of data.posts){
+        for (post of data.posts) {
             changeAttachementsToString(post);
         }
-        for(photo of data.photos) {
+        for (photo of data.photos) {
             changeAttachementsToString(photo);
         }
     }
 
     function share(res) {
         client.destroy();
-        client = new WebTorrent();
+
         var data = {};
         db.getUserGuid()
             .then(function (guid) {
                 console.log(guid);
                 db.getAllDocs(guid.value).then(function (data) {
-                    if(data.profile) {
-                    prepareForTorrent(data);
-                    console.log('Torrent info hash:', data);
+                    if (data.profile) {
+                        prepareForTorrent(data);
+                        console.log('Torrent info hash:', data);
 
-                    var fileBuffer = new Buffer(JSON.stringify(data));
-                    fileBuffer.name = data.profile.full_name;
+                        var fileBuffer = new Buffer(JSON.stringify(data));
+                        fileBuffer.name = data.profile.full_name;
+                        client = new WebTorrent();
+                        client.seed(fileBuffer, function onTorrent(torrent) {
+                            // Client is seeding the file!
+                            console.log('Torrent info hash:', torrent.magnetURI);
+                            runPublish(guid.keypair.publicKey, guid.keypair.secretKey, torrent.infoHash)
+                            if (res) res.json(torrent.infoHash)
 
-                    client.seed(fileBuffer, function onTorrent(torrent) {
-                        // Client is seeding the file!
-                        console.log('Torrent info hash:', torrent.magnetURI);
-                        console.log(client);
-                        runPublish(guid.keypair.publicKey, guid.keypair.secretKey, torrent.infoHash)
-                        if (res) res.json(torrent.infoHash)
-
-                    });
+                        });
                     }
                 });
 
@@ -212,15 +216,17 @@ module.exports = function (app, db, client) {
             dht.get(targetID, function (err, res) {
                 if (err || !res) {
                     console.log('{red:not found}')
-                    if(response) response.json(err)
+                    if (response) response.json(err)
                     client.destroy();
                 } else {
                     console.log('response:')
-                    console.log(res)
+
+                    var magnetURI = res.v.ih.toString('hex');
+                    console.log(magnetURI)
                     client.destroy();
 
-                    console.log(res.v.ih.toString('hex'));
-                    getTorrent(res.v.ih.toString('hex'), response);
+                    console.log();
+                    getTorrent(magnetURI, response);
                 }
             })
 

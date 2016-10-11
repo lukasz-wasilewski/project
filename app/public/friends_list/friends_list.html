@@ -1,9 +1,11 @@
 <form class="form-horizontal">
-  <div class="input-group" style="width: 400px">
+  <div class="input-group">
+    <span class="input-group-addon" id="basic-addon3">Torrent hash</span>
     <input type="text" class="form-control input-lg text-center" placeholder="Znajdz przyjaciol" ng-model="search_id">
     <span class="input-group-btn">
-            <button type="submit" class="btn btn-primary btn-lg" ng-click="get()">Szukaj</button>
-             </span>
+      <button class="btn btn-info btn-lg" ng-click="$ctrl.copyFromClipboard()">Wklej ze schowka</button>
+      <button type="submit" class="btn btn-primary btn-lg" ng-click="get()">Szukaj</button>
+    </span>
   </div>
   <div>
 </form>
