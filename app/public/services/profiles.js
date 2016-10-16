@@ -22,6 +22,15 @@
             },
             get_all_user_data: function (id) {
                 return $http.get('/profiles/all_data/' + id);
+            },
+            get_data: function () {
+                return $http.get('/data');
+            },
+            post_data: function (id) {
+                return $http.post('/data/' + id);
+            },
+            save_friend: function (data) {
+                return $http.post('/save_friend',data);
             }
         };
     }

@@ -3,11 +3,85 @@ var _ = require('lodash');
 var WebTorrent = require('webtorrent');
 var crypto = require('crypto')
 var ed = require('ed25519-supercop')
-module.exports = function (app, db, client) {
+module.exports = function (app, db) {
 
     app.post('/share', function (req, res) {
         console.log(req.body);
         share(res);
+    });
+
+    app.get('/data', function (req, res) {
+        var data = {};
+        db.getUserGuid()
+            .then(function (guid) {
+                console.log(guid);
+                db.getAllDocs(guid.value).then(function (data) {
+                    if (data.profile) {
+                        prepareForTorrent(data);
+                        console.log('Torrent info hash:', data);
+
+                        res.json(data);
+                    } else {
+                        res.json(data);
+                    }
+                });
+            });
+    });
+
+    app.post('/save_friend', function (req, res) {
+
+        var temp = req.body.data;
+        console.log(temp);
+        temp.profile._id = "profile_" + temp.profile._id;
+        if (temp.profile._attachments) {
+            for (data in temp.profile._attachments) {
+                temp.profile._attachments[data].data = new Buffer(temp.profile._attachments[data].data, 'base64')
+            }
+        }
+        console.log(temp.profile._id);
+        db.db.get(temp.profile._id).then(function (p) {
+            temp.profile._rev = p._rev;
+            db.db.put(temp.profile);
+        }).catch(function () {
+            delete temp.profile._rev;
+            db.db.put(temp.profile);
+        });
+        db.getPost(temp.profile._id).then(function (p) {
+            for (post of temp.posts) {
+                if (!_.some(p.rows, function (row) {
+                        return row.doc.text === post.text
+                    })) {
+                    delete post._rev;
+                    db.putPost(post, temp.profile._id);
+                }
+            }
+        });
+
+
+        db.getPhoto(temp.profile._id).then(function (p) {
+
+            for (photo of temp.photos) {
+                console.log(p);
+                if (!_.some(p.rows, function (row) {
+                        return row.doc.album === photo.album
+                    })) {
+                    delete photo._rev;
+                    db.putPhoto(photo, temp.profile._id);
+                }
+
+            }
+        })
+        if (res) res.json("infoHash")
+    });
+
+    app.post('/data/:user_id', function (req, res) {
+        var infoHash = req.params.user_id;
+        console.log(infoHash);
+        db.getUserGuid()
+            .then(function (guid) {
+                runPublish(guid.keypair.publicKey, guid.keypair.secretKey, infoHash)
+                if (res) res.json(infoHash)
+            })
     });
 
     app.post('/upload/:user_id', function (req, res) {
@@ -23,11 +97,13 @@ module.exports = function (app, db, client) {
     function getTorrent(infoHash, res) {
         var client = new WebTorrent();
 
-        var magnetURI = 'magnet:?xt=urn:btih:' + infoHash + '&tr=udp://exodus.desync.com:6969&tr=udp://tracker.coppersurfer.tk:6969&tr=udp://tracker.internetwarriors.net:1337&tr=udp://tracker.leechers-paradise.org:6969&tr=udp://tracker.openbittorrent.com:80&tr=wss://tracker.btorrent.xyz&tr=wss://tracker.fastcast.nz&tr=wss://tracker.openwebtorrent.com&tr=wss://tracker.webtorrent.io';
+        var magnetURI = 'magnet:?xt=urn:btih:' + infoHash + '&tr=udp%3A%2F%2Fexodus.desync.com%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com';
         console.log(magnetURI);
-
+        if (res) res.json(magnetURI);
+        /*
         var torrent = client.add(magnetURI);
         torrent.on('done', function () {
+            console.log("aaa");
             torrent.files.forEach(function (file) {
                 // Get a url for each file
                 console.log(file);
@@ -85,9 +161,7 @@ module.exports = function (app, db, client) {
 
             });
         })
-        if (res) res.json({
-            "status": "success"
-        });
+                */
     }
 
     function changeAttachementsToString(data) {
@@ -109,7 +183,6 @@ module.exports = function (app, db, client) {
     }
 
     function share(res) {
-        client.destroy();
 
         var data = {};
         db.getUserGuid()
@@ -121,9 +194,15 @@ module.exports = function (app, db, client) {
                         console.log('Torrent info hash:', data);
 
                         var fileBuffer = new Buffer(JSON.stringify(data));
-                        fileBuffer.name = data.profile.full_name;
-                        client = new WebTorrent();
-                        client.seed(fileBuffer, function onTorrent(torrent) {
+                        fileBuffer.name = guid.value;
+                        var client = new WebTorrent({
+                            dht: {
+                                verify: ed.verify
+                            }
+                        });
+                        client.seed(fileBuffer, {
+                            name: guid.value
+                        }, function onTorrent(torrent) {
                             // Client is seeding the file!
                             console.log('Torrent info hash:', torrent.magnetURI);
                             runPublish(guid.keypair.publicKey, guid.keypair.secretKey, torrent.infoHash)
