@@ -16,7 +16,7 @@
             } = require('electron')
             $scope.search_id = clipboard.readText();
         }
-        
+
 
         Profiles.get()
             .success(function (data) {
@@ -31,10 +31,14 @@
         };
         $scope.get = function () {
             ctrl.progress = true;
-            Profiles.get_friend($scope.search_id).then(function(){
-                toastr.success('Dodano znajomego');
-                ctrl.progress = false;
-                $state.reload();
+            Profiles.get_friend($scope.search_id).then(function () {
+
+                setTimeout(function () {
+                    toastr.success('Dodano znajomego');
+                    ctrl.progress = false;
+                    $state.reload();
+                }, 2000)
+
             });
         };
     }
