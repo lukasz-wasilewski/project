@@ -27,11 +27,11 @@
                 </div>
             </div>
         </div>
-        <div ng-if="!$ctrl.editable">
+        <div ng-if="!$ctrl.editable" style="display: flex">
             <div>
                 <img class="thumbnail" ng-src="{{photo}}" alt="" style="height: 250px; width: 250px">
             </div>
-            <h1>{{profile.full_name}}</h1>
+            <h1 style="margin: 5px">{{profile.full_name}}</h1>
         </div>
     </div>
 

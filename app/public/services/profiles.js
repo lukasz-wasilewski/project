@@ -14,7 +14,11 @@
             save: function (profil) {
                 var xhr = new XMLHttpRequest();
                 xhr.open('POST', '/profiles/save', true);
-                return xhr.send(profil);
+                xhr.send(profil);
+                setTimeout(function(){
+                    get_data();
+                }, 3000)
+                
             },
             get_profile: function (id) {
                 return $http.get('/profiles/user/' + id);
@@ -38,18 +42,21 @@
         function get_data() {
             return $http.get('/data')
                 .then(function (data) {
-                    client.destroy();
-                    client = new WebTorrent()
-                    var blob = new Blob([JSON.stringify(data)], {
-                        type: 'application/json'
-                    });
-                    blob.name = 'Some file name'
-                    client.seed(blob, function (t) {
-                        console.log(t.magnetURI);
-                        post_data(t.infoHash).then(function () {
-                            toastr.success('Profil udostepniono z sukcesem');
+                    console.log(data);
+                    if (data.data.profile != undefined) {
+                        client.destroy();
+                        client = new WebTorrent()
+                        var blob = new Blob([JSON.stringify(data)], {
+                            type: 'application/json'
+                        });
+                        blob.name = 'Some file name'
+                        client.seed(blob, function (t) {
+                            console.log(t.magnetURI);
+                            post_data(t.infoHash).then(function () {
+                                toastr.success('Profil udostepniono z sukcesem');
+                            })
                         })
-                    })
+                    }
                 });
         }
 
@@ -81,7 +88,7 @@
                                     var base64data = reader.result;
                                     save_friend(base64data).then(function (a) {
                                         console.log(a);
-                                        
+
                                         client.destroy();
                                     });
                                 }

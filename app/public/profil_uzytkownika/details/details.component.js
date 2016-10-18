@@ -13,7 +13,7 @@
         }
     });
 
-    function ProfilUzytkownikaCtrl(Profiles, $http) {
+    function ProfilUzytkownikaCtrl(Profiles, $http, toastr, $state) {
         var ctrl = this;
         ctrl.saveProfile = function () {
             console.log("Saving data...");
@@ -31,7 +31,8 @@
             Profiles.save(fd)
             toastr.success('Profil zapisano');
             ctrl.post.info = ctrl.profile.full_name;
-            Profiles.get_data();
+            
+            $state.reload();
         };
     }
 

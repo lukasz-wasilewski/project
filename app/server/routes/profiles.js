@@ -40,8 +40,8 @@ module.exports = function (app, db, t) {
                     }
                     data.photos = result;
                     res.json(data);
-                } else{
-                res.status(404).json("aa");
+                } else {
+                    res.status(404).json("none");
                 }
 
             }).catch(function (err) {
@@ -80,31 +80,31 @@ module.exports = function (app, db, t) {
         req.busboy.on('finish', function () {
             console.log('Done parsing form!');
             var profile = {};
-                    profile.full_name = newFile.full_name;
-                    profile.job = newFile.job;
-                    profile.born_date = newFile.born_date;
-                    profile.live = newFile.live;
-                    profile.sex = newFile.sex;
-                    db.putUser(profile).then(function (photo) {
-                        var keys = Object.keys(newFile.files);
-                        var last = keys[keys.length - 1];
-                        if (keys.length === 0) {
-                            //t.share(res);
-                        }
-                        for (var file_name in newFile.files) {
-                            console.log(photo.id);
-                            var file_data = newFile.files[file_name];
-                            db.db.putAttachment(photo.id, "profilowe", photo.rev, file_data.buffer, file_data.type).then(function (result) {
-                                // handle result
-                                //if (file_name === last)
-                                    //t.share(res)
-                            }).catch(function (err) {
-                                console.log(err);
-                                res.json(err);
-                            });
-                        }
+            profile.full_name = newFile.full_name;
+            profile.job = newFile.job;
+            profile.born_date = newFile.born_date;
+            profile.live = newFile.live;
+            profile.sex = newFile.sex;
+            db.putUser(profile).then(function (photo) {
+                var keys = Object.keys(newFile.files);
+                var last = keys[keys.length - 1];
+                if (keys.length === 0) {
+                    //t.share(res);
+                }
+                for (var file_name in newFile.files) {
+                    console.log(photo.id);
+                    var file_data = newFile.files[file_name];
+                    db.db.putAttachment(photo.id, "profilowe", photo.rev, file_data.buffer, file_data.type).then(function (result) {
+                        // handle result
+                        //if (file_name === last)
+                        //t.share(res)
+                    }).catch(function (err) {
+                        console.log(err);
+                        res.json(err);
                     });
-                });
+                }
+            });
+        });
     });
 
 }
