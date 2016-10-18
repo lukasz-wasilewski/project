@@ -10,7 +10,7 @@
         }
     });
 
-    function ProfilUzytkownikaCtrl(Photos, $state) {
+    function ProfilUzytkownikaCtrl(Photos, $state, toastr) {
         var ctrl = this;
         ctrl.upload = function (FlowFile, message, event) {
             console.log('catchAll', FlowFile);

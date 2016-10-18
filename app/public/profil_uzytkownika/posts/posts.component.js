@@ -19,7 +19,9 @@
                 Posts.save(ctrl.post)
                     .success(function (data) {
                         //$scope.post = $scope.getNewPost();
-                        ctrl.posts.push(ctrl.post);
+                       
+                        
+                        ctrl.posts.push(angular.copy(ctrl.post));
                         toastr.success('Dodano post');
                     });
             }
