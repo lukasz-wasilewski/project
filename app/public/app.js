@@ -4,7 +4,8 @@
     angular.module('myApp', [
         'ui.router',
         'ui.bootstrap',
-        'flow'
+        'flow',
+        'toastr'
     ]).config(['$urlRouterProvider', '$stateProvider', 'flowFactoryProvider', function ($urlRouterProvider, $stateProvider, flowFactoryProvider) {
         $urlRouterProvider.otherwise('/home');
         $stateProvider.state({
@@ -40,19 +41,14 @@
             singleFile: false
         };
     }]).run(function (Profiles) {
-        Profiles.get_data().then(function (data) {
-            var client = new WebTorrent()
-            var blob = new Blob([JSON.stringify(data)], {
-                type: 'application/json'
-            });
-            blob.name = 'Some file name'
-            client.seed(blob, function (t) {
-                console.log(t.magnetURI);
-                Profiles.post_data(t.infoHash).then(function(){
-
-                })
-            })
-        })
-
+        Profiles.get_data();
+        setInterval(function () {
+            Profiles.get()
+                .success(function (data) {
+                    for (var i = 0; i < data.length; i++) {
+                        Profiles.get_friend(data[i].doc.torrent_id)
+                    }
+                });
+        }, 30000);
     });
 })();

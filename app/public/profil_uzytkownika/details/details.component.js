@@ -29,9 +29,9 @@
                 fd.append("files[]", ctrl.profile.profile_photo);
             }
             Profiles.save(fd)
-                
+            toastr.success('Profil zapisano');
             ctrl.post.info = ctrl.profile.full_name;
-            
+            Profiles.get_data();
         };
     }
 

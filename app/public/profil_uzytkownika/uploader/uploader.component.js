@@ -10,7 +10,7 @@
         }
     });
 
-    function ProfilUzytkownikaCtrl(Photos) {
+    function ProfilUzytkownikaCtrl(Photos, $state) {
         var ctrl = this;
         ctrl.upload = function (FlowFile, message, event) {
             console.log('catchAll', FlowFile);
@@ -24,6 +24,8 @@
             fd.append("album", ctrl.album.name);
             console.log(ctrl.album.name);
             Photos.save(fd);
+            toastr.success('Zdjecia dodano');
+            $state.reload();
         };
     }
 

@@ -7,7 +7,7 @@
             controller: FriendsListCtrl
         });
 
-    function FriendsListCtrl($scope, $window, Profiles, $http, Photos, $filter, $location) {
+    function FriendsListCtrl($scope, $window, Profiles, $http, Photos, $filter, $location, toastr, $state) {
         var ctrl = this;
 
         ctrl.copyFromClipboard = function () {
@@ -16,6 +16,7 @@
             } = require('electron')
             $scope.search_id = clipboard.readText();
         }
+        
 
         Profiles.get()
             .success(function (data) {
@@ -29,38 +30,12 @@
             $location.path("/profile/" + profile.id);
         };
         $scope.get = function () {
-
-            $http.post('/upload/' + $scope.search_id)
-                .success(function (data) {
-                    console.log(data);
-                    var client = new WebTorrent()
-                    var torrent = client.add(data, function (t) {
-                        console.log(t.infoHash);
-
-                    })
-
-                    torrent.on('done', function () {
-                        console.log("aaa");
-                        torrent.files.forEach(function (file) {
-                            // Get a url for each file
-                            console.log(file);
-                            file.getBlob(function (err, buffer) {
-                                if (err) throw err;
-                                console.log(buffer);
-                                var reader = new window.FileReader();
-                                reader.readAsText(buffer);
-                                reader.onloadend = function () {
-                                    var base64data = reader.result;
-                                    Profiles.save_friend(base64data).then(function(a){
-                                        console.log(a);
-                                    });
-                                }
-
-                            })
-                        })
-                    })
-
-                });
+            ctrl.progress = true;
+            Profiles.get_friend($scope.search_id).then(function(){
+                toastr.success('Dodano znajomego');
+                ctrl.progress = false;
+                $state.reload();
+            });
         };
     }
 })();

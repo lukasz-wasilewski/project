@@ -89,15 +89,15 @@ module.exports = function (app, db, t) {
                         var keys = Object.keys(newFile.files);
                         var last = keys[keys.length - 1];
                         if (keys.length === 0) {
-                            t.share(res);
+                            //t.share(res);
                         }
                         for (var file_name in newFile.files) {
                             console.log(photo.id);
                             var file_data = newFile.files[file_name];
                             db.db.putAttachment(photo.id, "profilowe", photo.rev, file_data.buffer, file_data.type).then(function (result) {
                                 // handle result
-                                if (file_name === last)
-                                    t.share(res)
+                                //if (file_name === last)
+                                    //t.share(res)
                             }).catch(function (err) {
                                 console.log(err);
                                 res.json(err);

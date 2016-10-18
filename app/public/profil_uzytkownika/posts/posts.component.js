@@ -12,7 +12,7 @@
         }
     });
 
-    function ProfilUzytkownikaCtrl(Posts) {
+    function ProfilUzytkownikaCtrl(Posts, toastr) {
         var ctrl = this;
         ctrl.createPost = function () {
             if (ctrl.post.user != "") {
@@ -20,6 +20,7 @@
                     .success(function (data) {
                         //$scope.post = $scope.getNewPost();
                         ctrl.posts.push(ctrl.post);
+                        toastr.success('Dodano post');
                     });
             }
         };
