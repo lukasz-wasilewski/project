@@ -15,8 +15,8 @@
     </div>
     <div id="todo-list">
         <div>
-            <div class="alert alert-info" role="alert" ng-repeat="alert in $ctrl.posts" type="info" close="$ctrl.deleteTodo(alert._id)">
-<p class="text-left text-muted">{{alert.full_name}}</p>
+            <div class="alert alert-info" role="alert" ng-repeat="alert in $ctrl.posts track by $index" type="info">
+                <p class="text-left text-muted">{{alert.full_name}}</p>
                 <p class="text-center">{{alert.text}}</p>
             </div>
         </div>

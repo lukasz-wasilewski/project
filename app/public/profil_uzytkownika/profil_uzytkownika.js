@@ -13,14 +13,17 @@
 
     function ProfilUzytkownikaCtrl($scope, $window, $http, Profiles, Posts, Photos, $q) {
         var ctrl = this;
+        const nativeImage = require('electron').nativeImage
 
-        ctrl.copyToClipboard = function() {
-            const {clipboard} = require('electron')
+        ctrl.copyToClipboard = function () {
+            const {
+                clipboard
+            } = require('electron')
             clipboard.writeText($scope.post.user)
         }
 
         ctrl.$onInit = function () {
-            
+
             $scope.getNewPost = function () {
                 return {
                     text: "",
@@ -31,17 +34,17 @@
                     },
                     type: "post",
                     info: "",
-                    profile_photo: "",
                     to_delete: false
                 };
             };
             $scope.torrent_hash = "";
             $scope.post = $scope.getNewPost();
-            $scope.photos = {};
+            $scope.photos = [];
+            $scope.posts = [];
 
 
             var getting_profil = Profiles.get_all_user_data(ctrl.id)
-                .success(function (data) {
+                .then(function (data) {
                     console.log(data);
                     if (data != null) {
                         var profile = data.profile;
@@ -50,23 +53,26 @@
                         $scope.post.user = profile.torrent_id;
                         $scope.post.info = profile.full_name;
                         if (profile._attachments) {
-                            $scope.photo = "data:" + profile._attachments["profilowe"].content_type + ";base64," + profile._attachments["profilowe"].data;
+                            $scope.photo = nativeImage.createFromBuffer(profile._attachments["profilowe"].data);
                         }
 
-                        var result = {};
                         for (var i = 0; i < data.photos.length; i++) {
-                            data.photos[i].file.data = "data:" + data.photos[i].file.contentType + ";base64, " + data.photos[i].file.data;
-                            if (data.photos[i].album in result) {
-                                result[data.photos[i].album].push(data.photos[i]);
-                            } else {
-                                result[data.photos[i].album] = [data.photos[i]];
+                            for(var name in data.photos[i]._attachments){
+                                var img = nativeImage.createFromBuffer(data.photos[i]._attachments[name].data);
+                                data.photos[i]._attachments[name].data = img.toDataURL();
+                                console.log(name)
+
                             }
+                            
                         }
-                        $scope.photos = result;
-                        $scope.posts = data.posts;
+                        console.log(data.photos)
+
+                        $scope.photos.push.apply($scope.photos, data.photos);
+                        $scope.posts.push.apply($scope.posts, data.posts)
+                        $scope.$apply();
                     }
                 })
-                .error(function (data) {
+                .catch(function (data) {
                     console.log(data);
                     $scope.profile = {
                         full_name: "",
@@ -80,9 +86,21 @@
         }
 
 
-        $scope.upload_profile = function (FlowFile, message, event) {
-            console.log('catchAll', FlowFile);
-            $scope.profile.profile_photo = FlowFile.file;
+        $scope.upload_profile = function () {
+            const {
+                dialog
+            } = require('electron').remote;
+
+            let file = dialog.showOpenDialog({
+                properties: ['openFile'],
+                filters: [{
+                    name: 'Images',
+                    extensions: ['jpg', 'png', 'gif']
+                }]
+            })
+            console.log(file);
+            let image = nativeImage.createFromPath(file[0])
+            $scope.photo = image;
         };
     }
 })();

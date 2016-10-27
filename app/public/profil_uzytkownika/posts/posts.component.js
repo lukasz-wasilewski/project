@@ -7,17 +7,20 @@
         controller: ProfilUzytkownikaCtrl,
         bindings: {
             post: "<",
-            posts: "<",
+            posts: '<',
             editable: '<'
         }
     });
 
     function ProfilUzytkownikaCtrl(Posts, toastr) {
         var ctrl = this;
+        ctrl.$onChanges =function(changesObj){
+            console.log(changesObj);
+        }
         ctrl.createPost = function () {
             if (ctrl.post.user != "") {
                 Posts.save(ctrl.post)
-                    .success(function (data) {
+                    .then(function (data) {
                         //$scope.post = $scope.getNewPost();
                        
                         

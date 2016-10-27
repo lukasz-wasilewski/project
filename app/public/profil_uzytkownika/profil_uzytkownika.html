@@ -2,11 +2,10 @@
     <div class="jumbotron">
         <div ng-if="$ctrl.editable" style="display: flex">
             <div>
-                <div flow-init flow-files-submitted="$flow.upload()" flow-file-added="!!{png:1,gif:1,jpg:1,jpeg:1}[$file.getExtension()]"
-                    flow-file-success="upload_profile( $file, $message, $flow )">
-                    <div class="drop" flow-drop ng-class="dropClass">
-                        <div class="thumbnail" style="height: 250px; width: 250px" flow-btn>
-                            <img ng-src="{{photo}}" flow-img="$flow.files[0]" style="height: 240px; width: 250px" />
+                <div >
+                    <div >
+                        <div class="thumbnail" style="height: 250px; width: 250px">
+                            <img ng-src="{{photo.toDataURL()}}" style="height: 240px; width: 250px" ng-click="upload_profile()"/>
                         </div>
                     </div>
                 </div>
@@ -29,7 +28,7 @@
         </div>
         <div ng-if="!$ctrl.editable" style="display: flex">
             <div>
-                <img class="thumbnail" ng-src="{{photo}}" alt="" style="height: 250px; width: 250px">
+                <img class="thumbnail" ng-src="{{photo.toDataURL()}}" alt="" style="height: 250px; width: 250px">
             </div>
             <h1 style="margin: 5px">{{profile.full_name}}</h1>
         </div>
@@ -37,7 +36,7 @@
 
     <uib-tabset active="activeJustified" justified="true">
         <uib-tab index="0" heading="Szczegoly">
-            <details-component profile="profile" post="post" editable="$ctrl.editable"></details-component>
+            <details-component profile="profile" photo="photo" post="post" editable="$ctrl.editable"></details-component>
         </uib-tab>
         <uib-tab index="1" heading="Posty">
             <posts-component posts="posts" post="post" editable="$ctrl.editable"></posts-component>

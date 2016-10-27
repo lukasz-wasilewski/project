@@ -5,9 +5,8 @@
     <title>Magisterka</title>
     <meta name="description" content="">
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/bower_components/angular-bootstrap/ui-bootstrap-csp.css">
-    <link rel="stylesheet" type="text/css" href="/bower_components/angular-toastr/dist/angular-toastr.css" />
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../node_modules/angular-toastr/dist/angular-toastr.css" />
 
     <link rel="stylesheet" href="app.css">
 </head>
@@ -20,25 +19,26 @@
         <ui-view></ui-view>
     </div>
 </section>
-<script src="/bower_components/angular/angular.js"></script>
-<script src="/angular-ui-router/release/angular-ui-router.js"></script>
-<script src="/bower_components/angular-route/angular-route.js"></script>
-<script src="/bower_components/flow.js/dist/flow.js"></script>
-<script src="/bower_components/ng-flow/dist/ng-flow-standalone.js"></script>
-<script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-<script type="text/javascript" src="/bower_components/angular-toastr/dist/angular-toastr.tpls.js"></script>
-<script src="https://cdn.jsdelivr.net/webtorrent/latest/webtorrent.min.js"></script>
+<script>
+require('angular');
+require('angular-ui-router');
+require('angular-route');
+require('flow');
+require('angular-ui-bootstrap');
+require('angular-toastr');
+require('webtorrent');
 
-<script src="app.js"></script>
-<script src="home/home.js"></script>
-<script src="profil_uzytkownika/profil_uzytkownika.js"></script>
-<script src="friends_list/friends_list.js"></script>
-<script src="services/photos.js"></script>
-<script src="services/posts.js"></script>
-<script src="services/profiles.js"></script>
-<script src="profil_uzytkownika/uploader/uploader.component.js"></script>
-<script src="profil_uzytkownika/albums/albums.component.js"></script>
-<script src="profil_uzytkownika/details/details.component.js"></script>
-<script src="profil_uzytkownika/posts/posts.component.js"></script>
+require(__dirname+'/app.js');
+require(__dirname+'/home/home.js');
+require(__dirname+'/profil_uzytkownika/profil_uzytkownika.js');
+require(__dirname+'/friends_list/friends_list.js');
+require(__dirname+'/services/photos.js');
+require(__dirname+'/services/posts.js');
+require(__dirname+'/services/profiles.js');
+require(__dirname+'/profil_uzytkownika/uploader/uploader.component.js');
+require(__dirname+'/profil_uzytkownika/albums/albums.component.js');
+require(__dirname+'/profil_uzytkownika/details/details.component.js');
+require(__dirname+'/profil_uzytkownika/posts/posts.component.js');
+</script>
 </body>
 </html>

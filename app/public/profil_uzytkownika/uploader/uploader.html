@@ -4,14 +4,13 @@
 
 <form class="form-horizontal">
 
-    <div flow-init flow-files-submitted="$flow.upload()" flow-file-added="!!{png:1,gif:1,jpg:1,jpeg:1}[$file.getExtension()]">
+    <div>
 
         <div class="input-group">
             <span class="input-group-addon">Nazwa albumu</span>
             <input type="text" class="form-control" id="galery" placeholder="Nazwa Albumu" data-ng-model="$ctrl.album.name">
-            <div class="input-group-btn drop" flow-drop ng-class="dropClass">
-                <span class="btn btn-default" flow-btn>Dodaj zdjecie</span>
-                <span class="btn btn-default" flow-btn flow-directory ng-show="$flow.supportDirectory">Dodaj folder zdjec</span>
+            <div class="input-group-btn">
+                <span class="btn btn-default" ng-click="$ctrl.selectFiles()">Dodaj zdjecia</span>
             </div>
         </div>
         <br/>
@@ -22,7 +21,7 @@
 
 
                 <div class="thumbnail">
-                    <img flow-img="file" style="height: 250px; width: 250px" />
+                    <img ng-src="file" style="height: 250px; width: 250px" />
                 </div>
                 <div class="btn-group" style="display: flex;flex-direction: column;">
                     <a class="btn btn-xs btn-danger" ng-click="file.cancel()">
@@ -35,7 +34,7 @@
         </div>
         <div>
             <div class="pull-right">
-                <button style="margin: 7px" type="submit" class="btn btn-default" ng-click="$ctrl.upload( $flow.files, $message, $flow )">
+                <button style="margin: 7px" type="submit" class="btn btn-default" ng-click="$ctrl.upload()">
                             Zapisz
                         </button>
             </div>

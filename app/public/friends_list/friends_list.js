@@ -16,14 +16,18 @@
             } = require('electron')
             $scope.search_id = clipboard.readText();
         }
+        const nativeImage = require('electron').nativeImage
 
 
         Profiles.get()
-            .success(function (data) {
-                $scope.friends_list = data;
+            .then(function (data) {
+                
+                console.log(data)
                 for (var i = 0; i < data.length; i++) {
-                    data[i].photo = "data:" + data[i].doc._attachments["profilowe"].content_type + ";base64," + data[i].doc._attachments["profilowe"].data;
+                    data[i].photo = nativeImage.createFromBuffer(data[i].doc._attachments["profilowe"].data);
                 }
+                $scope.friends_list = data;
+                $scope.$apply();
             });
         $scope.search_id = "";
         $scope.goToProfile = function (profile) {
@@ -31,15 +35,14 @@
         };
         $scope.get = function () {
             ctrl.progress = true;
-            Profiles.get_friend($scope.search_id).then(function () {
-
+            Profiles.runConsume($scope.search_id)
+/*
                 setTimeout(function () {
                     toastr.success('Dodano znajomego');
                     ctrl.progress = false;
                     $state.reload();
-                }, 2000)
-
-            });
+                }, 10000)
+*/
         };
     }
 })();

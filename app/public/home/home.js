@@ -1,26 +1,21 @@
 (function () {
-    'use strict';
-    
-    angular.module('myApp')
+  'use strict';
+
+  angular.module('myApp')
     .component('homeComponent', {
-        templateUrl: 'home/home.html',
-        controller: HomeCtrl
+      templateUrl: 'home/home.html',
+      controller: HomeCtrl
     });
-                    
-    function HomeCtrl($scope, $http, Posts) {
-      var ctrl = this;
-      ctrl.post = {};
 
-        Posts.get_all()
-          .success(function (data) {
-            ctrl.posts = data;
-          });
-
-      ctrl.deleteTodo = function (id) {
-          Posts.delete(id)
-            .success(function (data) {
-              ctrl.posts = data;
-            });
-      };
-    }
+  function HomeCtrl($scope, $http, Posts) {
+    var ctrl = this;
+    ctrl.post = {};
+    ctrl.posts = [];
+    Posts.get_all()
+      .then(function (data) {
+        console.log(data)
+        ctrl.posts.push.apply(ctrl.posts, data)
+        $scope.$apply();
+      });
+  }
 })();

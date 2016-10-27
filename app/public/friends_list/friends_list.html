@@ -18,9 +18,7 @@
 <ul class="media-list">
   <li class="media thumbnail" ng-repeat="profile in friends_list" ng-click="goToProfile(profile)">
     <div class="media-left">
-      <a>
-        <img class="media-object" ng-src="{{profile.photo}}" alt="...">
-      </a>
+        <img class="media-object" ng-src="{{profile.photo.toDataURL()}}" style="width: 100px; height"100px>
     </div>
     <div class="media-body">
       <h3 class="media-heading">{{profile.doc.full_name}}</h3>

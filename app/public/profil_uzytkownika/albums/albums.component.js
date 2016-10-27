@@ -22,6 +22,10 @@ function ProfilUzytkownikaCtrl($uibModal, $scope) {
                 size: 'lg'
             });
         };
+        ctrl.$onChanges =function(changesObj){
+            console.log(changesObj);
+            
+        }
         ctrl.album_view = "";
         ctrl.setAlbum = function(album) {
             ctrl.album_view = album;
