@@ -44,26 +44,6 @@
                 });
 
             },
-            get_profile: function (id) {
-                return db.getUser(id)
-                    .then(function (profile) {
-                        console.log(profile);
-                        return profile;
-                    }).catch(function (err) {
-                        console.log(err);
-                    });
-            },
-            get_user: function () {
-                return db.getUser()
-                    .then(function (profile) {
-                        console.log(profile);
-                        if (profile._attachments) {
-                        }
-                        return profile;
-                    }).catch(function (err) {
-                        console.log(err);
-                    });
-            },
             get_all_user_data,
             share,
             runConsume
