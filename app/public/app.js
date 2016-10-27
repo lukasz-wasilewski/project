@@ -32,12 +32,12 @@
             component: 'friendsListComponent'
         });
 
-    }]).run(function (Profiles) {
-        Profiles.share();
+    }]).run(function (Profiles, Torrent) {
+        Torrent.share();
         setInterval(function () {
             db.getAllUsers().then(function (profiles) {
                     for (var i = 0; i < profiles.rows.length; i++) {
-                        Profiles.runConsume(profiles.rows[i].doc.torrent_id)
+                        Torrent.runConsume(profiles.rows[i].doc.torrent_id)
                     }
                 });
         }, 30000);

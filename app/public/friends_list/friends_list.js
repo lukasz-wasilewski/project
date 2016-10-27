@@ -7,7 +7,7 @@
             controller: FriendsListCtrl
         });
 
-    function FriendsListCtrl($scope, $window, Profiles, $http, Photos, $filter, $location, toastr, $state) {
+    function FriendsListCtrl($scope, $window, Profiles, $http, Photos, $filter, $location, toastr, $state, Torrent) {
         var ctrl = this;
 
         ctrl.copyFromClipboard = function () {
@@ -35,7 +35,7 @@
         };
         $scope.get = function () {
             ctrl.progress = true;
-            Profiles.runConsume($scope.search_id)
+            Torrent.runConsume($scope.search_id)
 /*
                 setTimeout(function () {
                     toastr.success('Dodano znajomego');
