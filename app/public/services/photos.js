@@ -18,10 +18,7 @@
             }
             album._attachments = files;
 
-            db.putPhoto(album).then(function (photo) {
-
-            });
-
+            db.putPhoto(album);
         }
     }
 })();

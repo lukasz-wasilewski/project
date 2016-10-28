@@ -1,19 +1,18 @@
-
 var guid = require('guid');
 var PouchDB = require('pouchdb');
 var homedir = require('homedir');
 const path = require('path');
 var fs = require('fs');
-var dbPath = homedir() + path.sep+'app-users';
-if (!fs.existsSync(dbPath)){
+var dbPath = homedir() + path.sep + 'app-users';
+if (!fs.existsSync(dbPath)) {
     fs.mkdirSync(dbPath);
 }
-var db = new PouchDB(dbPath+path.sep+'my.db');
+var db = new PouchDB(dbPath + path.sep + 'my.db');
 var ed = require('ed25519-supercop')
-db.info().then(function(info) {
+db.info().then(function (info) {
     console.log(info);
 })
-module.exports = function() {
+module.exports = function () {
     return {
         db,
         getUserGuid,
@@ -29,10 +28,10 @@ module.exports = function() {
 
     function getUserGuid() {
         return db.get("app_guid")
-            .then(function(guid) {
+            .then(function (guid) {
                 return guid;
             })
-            .catch(function() {
+            .catch(function () {
                 var kp = ed.createKeyPair(ed.createSeed());
                 var keypair = {
                     publicKey: kp.publicKey.toString('hex'),
@@ -43,82 +42,79 @@ module.exports = function() {
                     value: guid.raw(),
                     keypair: keypair
                 };
-                db.put(result).then(function(posts) {
+                db.put(result).then(function (posts) {
                     console.log(posts);
-                }).catch(function(err) {
+                }).catch(function (err) {
                     console.log(err);
                 });
                 return result;
             });
     }
 
-    function getUser(userGuid) {
+    function getUserData(userGuid) {
         if (userGuid === undefined) {
             return getUserGuid()
-                .then(function(guid) {
-                    return db.get(guid.value, {attachments: true, binary:true});
+                .then(function (guid) {
+                    return db.get(guid.value, {
+                        attachments: true,
+                        binary: true
+                    });
                 })
         } else {
-            return db.get(userGuid, {attachments: true, binary:true});
+            return db.get(userGuid, {
+                attachments: true,
+                binary: true
+            });
         }
+    }
+
+    function getUser(userGuid) {
+        return getUserData(userGuid)
+            .then(function (profile) {
+                return profile;
+            })
+            .catch(function (err) {
+                console.log(err);
+            })
     }
 
     function getAllUsers() {
         return db.allDocs({
-                include_docs: true,
-                attachments: true,
-                startkey: "profile_",
-                endkey: 'profile_\uffff', binary:true
-            })
+            include_docs: true,
+            attachments: true,
+            startkey: "profile_",
+            endkey: 'profile_\uffff',
+            binary: true
+        }).then(function (profiles) {
+            return profiles.rows;
+        });
     }
 
     function getAllDocs(userGuid) {
-        var result = {};
-        return getUser(userGuid)
-            .then(function(profile){
-                result.profile = profile;
-            })
-            .catch(function(err) {
-                console.log(err);
-            })
-            .then(function(){
-                return getPost(userGuid);
-            })
-            .then(function(posts){
-                posts = posts.rows.map(function(val) {
-                    return val.doc;
-                });
-                result.posts = posts;
-            })
-            .catch(function(err) {
-                console.log(err);
-            })
-            .then(function(){
-                return getPhoto(userGuid);
-            })
-            .then(function(photos){
-                photos = photos.rows.map(function(val) {
-                    return val.doc;
-                });
-                result.photos = photos;
-            })
-            .catch(function(err) {
-                console.log(err);
-            })
-            .then(function(){
-                return result;
-            });
+        return Promise.all([
+            getUser(userGuid),
+            getPost(userGuid),
+            getPhoto(userGuid)
+        ]).then(values => {
+            let result = {
+                profile: values[0],
+                posts: values[1],
+                photos: values[2]
+            }
+            console.info("Retrived user data from db.", result);
+            return result;
+        });
     }
 
     function putUser(user) {
         return getUser()
-            .then(function(dbUser) {
+            .then(function (dbUser) {
                 user._rev = dbUser._rev;
                 return db.put(user);
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 return getUserGuid()
-                    .then(function(guid) {
+                    .then(function (guid) {
                         user._id = guid.value;
                         user.torrent_id = guid.keypair.publicKey;
                         return db.put(user);
@@ -127,7 +123,15 @@ module.exports = function() {
     }
 
     function getPost(guid) {
-        return getDoc(guid, 'post');
+        return getDoc(guid, 'post')
+            .then(function (posts) {
+                return posts.rows.map(function (val) {
+                    return val.doc;
+                });
+            })
+            .catch(function (err) {
+                console.log(err);
+            });
     }
 
     function putPost(post, userGuid) {
@@ -135,7 +139,15 @@ module.exports = function() {
     }
 
     function getPhoto(guid) {
-        return getDoc(guid, 'photo');
+        return getDoc(guid, 'photo')
+            .then(function (photos) {
+                return photos.rows.map(function (val) {
+                    return val.doc;
+                });
+            })
+            .catch(function (err) {
+                console.log(err);
+            });
     }
 
     function putPhoto(photo, userGuid) {
@@ -146,30 +158,32 @@ module.exports = function() {
         var today = new Date();
         if (userGuid === undefined) {
             return getUserGuid()
-            .then(function(guid) {
-                doc._id = type + "_" + guid.value + '_' + today.getTime();
-                return db.put(doc)
-            });
+                .then(function (guid) {
+                    doc._id = type + "_" + guid.value + '_' + today.getTime();
+                    return db.put(doc)
+                });
         } else {
             doc._id = type + "_" + userGuid + '_' + today.getTime();
             return db.put(doc)
         }
     }
 
-    function getDoc(guid, type){
+    function getDoc(guid, type) {
         if (guid === undefined) {
             return db.allDocs({
                 include_docs: true,
                 attachments: true,
                 startkey: type + "_",
-                endkey: type + '_\uffff', binary:true
+                endkey: type + '_\uffff',
+                binary: true
             })
         } else {
             return db.allDocs({
                 include_docs: true,
                 attachments: true,
                 startkey: type + "_" + guid + '_',
-                endkey: type + "_" + guid + '_\uffff', binary:true
+                endkey: type + "_" + guid + '_\uffff',
+                binary: true
             })
         }
     }

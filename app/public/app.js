@@ -1,6 +1,7 @@
 (function () {
     'use strict';
     var db = require('./services/db');
+    
     angular.module('myApp', [
         'ui.router',
         'ui.bootstrap',

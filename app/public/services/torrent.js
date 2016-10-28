@@ -110,10 +110,10 @@
             db.getUserGuid()
                 .then(function (guid) {
                     console.log(guid);
-                    db.getAllDocs(guid.value).then(function (data) {
+                    let data = db.getAllDocs(guid.value);
                         if (data.profile) {
                             Torrent.prepareForTorrent(data);
-                            console.log('Torrent info hash:', data);
+                            console.info('Torrent info hash:', data);
 
                             var fileBuffer = new Buffer(JSON.stringify(data));
                             fileBuffer.name = guid.value;
@@ -122,12 +122,11 @@
                                 name: guid.value
                             }, function onTorrent(torrent) {
                                 // Client is seeding the file!
-                                console.log('Torrent info hash:', torrent.magnetURI);
+                                console.info('Torrent info hash:', torrent.magnetURI);
                                 Torrent.runPublish(guid.keypair.publicKey, guid.keypair.secretKey, torrent.infoHash)
 
                             });
                         }
-                    });
 
                 }).catch(function (err) {
                     console.log(err);

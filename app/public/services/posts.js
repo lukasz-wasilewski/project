@@ -13,15 +13,7 @@
         };
 
         function get_all() {
-            return db.getPost()
-                .then(function (posts) {
-                    posts = posts.rows.map(function (val) {
-                        return val.doc;
-                    });
-                    return posts;
-                }).catch(function (err) {
-                    console.log(err);
-                });
+            return db.getPost();
         }
 
         function save(post) {
