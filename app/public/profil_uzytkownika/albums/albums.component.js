@@ -2,19 +2,18 @@
     'use strict';
 
     angular.module('myApp')
-    .component('albumsComponent', {
-        templateUrl: 'profil_uzytkownika/albums/albums.html',
-        controller: ProfilUzytkownikaCtrl,
-        bindings: {
-            photos: '<',
-            post: '<'
-        }
-    });
+        .component('albumsComponent', {
+            templateUrl: 'profil_uzytkownika/albums/albums.html',
+            controller: ProfilUzytkownikaCtrl,
+            bindings: {
+                photos: '<',
+                post: '<'
+            }
+        });
 
-function ProfilUzytkownikaCtrl($uibModal, $scope) {
+    function ProfilUzytkownikaCtrl($uibModal, $scope) {
         var ctrl = this;
-         ctrl.open = function (id) {
-            console.log(id);
+        ctrl.open = function (id) {
             var modalInstance = $uibModal.open({
                 animation: true,
                 scope: $scope,
@@ -22,12 +21,8 @@ function ProfilUzytkownikaCtrl($uibModal, $scope) {
                 size: 'lg'
             });
         };
-        ctrl.$onChanges =function(changesObj){
-            console.log(changesObj);
-            
-        }
         ctrl.album_view = "";
-        ctrl.setAlbum = function(album) {
+        ctrl.setAlbum = function (album) {
             ctrl.album_view = album;
         };
     }

@@ -45,7 +45,6 @@
 
             var getting_profil = Profiles.get_all_user_data(ctrl.id)
                 .then(function (data) {
-                    console.log(data);
                     if (data != null) {
                         var profile = data.profile;
                         $scope.profile = profile;
@@ -60,12 +59,8 @@
                             for(var name in data.photos[i]._attachments){
                                 var img = nativeImage.createFromBuffer(data.photos[i]._attachments[name].data);
                                 data.photos[i]._attachments[name].data = img.toDataURL();
-                                console.log(name)
-
                             }
-                            
                         }
-                        console.log(data.photos)
 
                         $scope.photos.push.apply($scope.photos, data.photos);
                         $scope.posts.push.apply($scope.posts, data.posts)
@@ -73,7 +68,6 @@
                     }
                 })
                 .catch(function (data) {
-                    console.log(data);
                     $scope.profile = {
                         full_name: "",
                         job: "",
@@ -98,7 +92,6 @@
                     extensions: ['jpg', 'png', 'gif']
                 }]
             })
-            console.log(file);
             let image = nativeImage.createFromPath(file[0])
             $scope.photo = image;
         };

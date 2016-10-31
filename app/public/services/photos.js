@@ -10,15 +10,13 @@
             save
         };
 
-        function save(newFile, files) {
-            console.log('Done parsing form!', newFile, files);
-            var album = {
-                text: newFile.text,
-                album: newFile.album
-            }
-            album._attachments = files;
-
-            db.putPhoto(album);
+        function save(album, files) {
+            console.info('Saving album', album, files);
+            return db.putPhoto({
+                text: album.text,
+                album: album.album,
+                _attachments: files
+            });
         }
     }
 })();

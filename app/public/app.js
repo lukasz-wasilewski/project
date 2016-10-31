@@ -19,7 +19,6 @@
             component: 'profilUzytkownikaComponent',
             resolve: {
                 id: function ($transition$) {
-                    console.log($transition$.params().personId);
                     return $transition$.params().personId;
                 },
                 editable: function ($transition$) {
@@ -37,8 +36,8 @@
         Torrent.share();
         setInterval(function () {
             db.getAllUsers().then(function (profiles) {
-                    for (var i = 0; i < profiles.rows.length; i++) {
-                        Torrent.runConsume(profiles.rows[i].doc.torrent_id)
+                    for (var i = 0; i < profiles.length; i++) {
+                        Torrent.runConsume(profiles[i].doc.torrent_id)
                     }
                 });
         }, 30000);

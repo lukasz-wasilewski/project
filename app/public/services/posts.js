@@ -17,6 +17,7 @@
         }
 
         function save(post) {
+            console.info('Saving post', post);
             return db.getUser()
                 .then(function (profile) {
                     db.putPost({

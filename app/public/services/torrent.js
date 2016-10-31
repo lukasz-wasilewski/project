@@ -6,10 +6,13 @@
     var ed = require('ed25519-supercop');
     var db = require('./db');
 
-    
-
     class Torrent {
         constructor() {
+            this.clientSeed = new WebTorrent({
+                dht: {
+                    verify: ed.verify
+                }
+            });
             this.client = new WebTorrent({
                 dht: {
                     verify: ed.verify
@@ -18,28 +21,28 @@
         }
 
 
-        static getTorrent(infoHash) {
-            var client = new WebTorrent();
+        getTorrent(infoHash) {
+            var self = this;
+            var magnetURI = `magnet:?xt=urn:btih:${infoHash}&tr=udp%3A%2F%2Fexodus.desync.com%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com`;
 
-            var magnetURI = 'magnet:?xt=urn:btih:' + infoHash + '&tr=udp%3A%2F%2Fexodus.desync.com%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com';
-            console.log(magnetURI);
-            var torrent = client.add(magnetURI);
+            for(let t of self.client.torrents) {
+                self.client.remove(t.infoHash);
+            }
+
+            let torrent = self.client.add(magnetURI);
+            
             return torrent.on('done', function () {
-                console.log("aaa");
                 torrent.files.forEach(function (file) {
-                    // Get a url for each file
-                    console.log(file);
                     file.getBuffer(function (err, buffer) {
                         if (err) throw err;
                         var temp = JSON.parse(buffer.toString('utf-8'));
-                        console.log(temp);
+                        console.info("Get profile from torrent.",temp);
                         temp.profile._id = "profile_" + temp.profile._id;
                         if (temp.profile._attachments) {
                             for (var data in temp.profile._attachments) {
                                 temp.profile._attachments[data].data = new Buffer(temp.profile._attachments[data].data, 'base64')
                             }
                         }
-                        console.log(temp.profile._id);
                         db.db.get(temp.profile._id).then(function (p) {
                             temp.profile._rev = p._rev;
                             db.db.put(temp.profile);
@@ -47,6 +50,7 @@
                             delete temp.profile._rev;
                             db.db.put(temp.profile);
                         });
+
                         db.getPost(temp.profile._id).then(function (p) {
                             for (var post of temp.posts) {
                                 if (!_.some(p.rows, function (row) {
@@ -58,9 +62,7 @@
                             }
                         });
 
-
                         db.getPhoto(temp.profile._id).then(function (p) {
-
                             for (var photo of temp.photos) {
                                 console.log(photo);
                                 if (!_.some(p.rows, function (row) {
@@ -69,18 +71,10 @@
                                     delete photo._rev;
                                     db.putPhoto(photo, temp.profile._id);
                                 }
-
                             }
                         })
 
-
-                        client.destroy();
-
-
-
                     });
-
-
                 });
             })
 
@@ -102,34 +96,33 @@
             for (var photo of data.photos) {
                 Torrent.changeAttachementsToString(photo);
             }
+            return new Buffer(JSON.stringify(data));
         }
 
         share() {
             var self = this;
-            var data = {};
+            for(let t of self.clientSeed.torrents) {
+                self.clientSeed.remove(t.infoHash);
+            }
             db.getUserGuid()
                 .then(function (guid) {
-                    console.log(guid);
-                    let data = db.getAllDocs(guid.value);
-                        if (data.profile) {
-                            Torrent.prepareForTorrent(data);
-                            console.info('Torrent info hash:', data);
+                    db.getAllDocs(guid.value)
+                        .then(function (data) {
+                            if (data.profile) {
+                                let fileBuffer = Torrent.prepareForTorrent(data);
 
-                            var fileBuffer = new Buffer(JSON.stringify(data));
-                            fileBuffer.name = guid.value;
-
-                            self.client.seed(fileBuffer, {
-                                name: guid.value
-                            }, function onTorrent(torrent) {
-                                // Client is seeding the file!
-                                console.info('Torrent info hash:', torrent.magnetURI);
-                                Torrent.runPublish(guid.keypair.publicKey, guid.keypair.secretKey, torrent.infoHash)
-
-                            });
-                        }
+                                self.clientSeed.seed(fileBuffer, {
+                                    name: guid.value
+                                }, function onTorrent(torrent) {
+                                    // Client is seeding the file!
+                                    console.info(`Seeding torrent with info hash: ${torrent.infoHash}`);
+                                    Torrent.runPublish(guid.keypair.publicKey, guid.keypair.secretKey, torrent.infoHash)
+                                });
+                            }
+                        });
 
                 }).catch(function (err) {
-                    console.log(err);
+                    console.error(err);
                 });
 
         }
@@ -173,12 +166,10 @@
                     }
 
                     function publishSeq(seq) {
-                        opts.seq = seq
-                        console.log('making request:')
-                        console.log(opts)
+                        opts.seq = seq;
                         dht.put(opts, function (err, hash) {
-                            if (err) console.log('{red:error publishing}')
-                            if (hash) console.log('{green:done}')
+                            if (err) console.error('{red:error publishing}')
+                            if (hash) console.info('{green:done}')
                             client.destroy()
                         })
 
@@ -191,6 +182,7 @@
         }
 
         runConsume(publicKey) {
+            var self = this;
             var buffPubKey = Buffer(publicKey, 'hex')
             var targetID = crypto.createHash('sha1').update(buffPubKey).digest('hex') // XXX missing salt
 
@@ -200,7 +192,7 @@
                 }
             })
 
-            var dht = client.dht
+            var dht = client.dht;
 
             console.log('connecting to DHT... ')
             return dht.on('ready', function () {
@@ -209,17 +201,13 @@
 
                 return dht.get(targetID, function (err, res) {
                     if (err || !res) {
-                        console.log('{red:not found}')
+                        console.error('{red:not found}')
                         client.destroy();
                     } else {
-                        console.log('response:')
-
                         var magnetURI = res.v.ih.toString('hex');
-                        console.log(magnetURI)
+                        console.info(`Get torrent infoHash ${magnetURI} for user id ${targetID}`)
                         client.destroy();
-
-                        console.log();
-                        return Torrent.getTorrent(magnetURI);
+                        return self.getTorrent(magnetURI);
                     }
                 })
 

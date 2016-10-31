@@ -13,7 +13,6 @@
     ctrl.posts = [];
     Posts.get_all()
       .then(function (data) {
-        console.log(data)
         ctrl.posts.push.apply(ctrl.posts, data)
         $scope.$apply();
       });

@@ -18,11 +18,8 @@
         }
         const nativeImage = require('electron').nativeImage
 
-
         Profiles.get()
             .then(function (data) {
-                
-                console.log(data)
                 for (var i = 0; i < data.length; i++) {
                     data[i].photo = nativeImage.createFromBuffer(data[i].doc._attachments["profilowe"].data);
                 }
@@ -36,13 +33,13 @@
         $scope.get = function () {
             ctrl.progress = true;
             Torrent.runConsume($scope.search_id)
-/*
-                setTimeout(function () {
-                    toastr.success('Dodano znajomego');
-                    ctrl.progress = false;
-                    $state.reload();
-                }, 10000)
-*/
+                /*
+                                setTimeout(function () {
+                                    toastr.success('Dodano znajomego');
+                                    ctrl.progress = false;
+                                    $state.reload();
+                                }, 10000)
+                */
         };
     }
 })();

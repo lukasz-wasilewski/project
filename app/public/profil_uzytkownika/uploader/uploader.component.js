@@ -13,11 +13,11 @@
     function ProfilUzytkownikaCtrl(Photos, $state, toastr) {
         var ctrl = this;
         const {
-                dialog
-            } = require('electron').remote;
-            const nativeImage = require('electron').nativeImage
+            dialog
+        } = require('electron').remote;
+        const nativeImage = require('electron').nativeImage
 
-        ctrl.selectFiles = function() {
+        ctrl.selectFiles = function () {
             let paths = dialog.showOpenDialog({
                 properties: ['openFile', 'multiSelections'],
                 filters: [{
@@ -27,14 +27,14 @@
             })
             console.log(paths);
             ctrl.files = {}
-            for(var i = 0; i < paths.length; i++) {
+            for (var i = 0; i < paths.length; i++) {
                 let image = nativeImage.createFromPath(paths[i])
-                ctrl.files["file_"+i] = {
+                ctrl.files["file_" + i] = {
                     data: image.toPNG(),
                     contentType: "image/png"
                 }
             }
-            
+
         }
 
         ctrl.upload = function () {
@@ -43,13 +43,13 @@
                 "user": ctrl.post.user,
                 "album": ctrl.album.name
             }
-            console.log(ctrl.album.name);
-            
-            
-            
-            Photos.save(file, ctrl.files);
-            toastr.success('Zdjecia dodano');
-            $state.reload();
+
+            Photos.save(file, ctrl.files)
+                .then(function () {
+                    toastr.success('Zdjecia dodano');
+                    $state.reload();
+                });
+
         };
     }
 

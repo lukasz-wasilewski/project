@@ -10,7 +10,7 @@ if (!fs.existsSync(dbPath)) {
 var db = new PouchDB(dbPath + path.sep + 'my.db');
 var ed = require('ed25519-supercop')
 db.info().then(function (info) {
-    console.log(info);
+    console.info("Connected to database.",info);
 })
 module.exports = function () {
     return {
@@ -42,10 +42,10 @@ module.exports = function () {
                     value: guid.raw(),
                     keypair: keypair
                 };
-                db.put(result).then(function (posts) {
-                    console.log(posts);
+                db.put(result).then(function (guid) {
+                    console.info("Created user guid.",guid);
                 }).catch(function (err) {
-                    console.log(err);
+                    console.error("Error while creating user guid.",err);
                 });
                 return result;
             });
@@ -74,7 +74,7 @@ module.exports = function () {
                 return profile;
             })
             .catch(function (err) {
-                console.log(err);
+                console.error(err);
             })
     }
 
@@ -130,7 +130,7 @@ module.exports = function () {
                 });
             })
             .catch(function (err) {
-                console.log(err);
+                console.error(err);
             });
     }
 
@@ -146,7 +146,7 @@ module.exports = function () {
                 });
             })
             .catch(function (err) {
-                console.log(err);
+                console.error(err);
             });
     }
 

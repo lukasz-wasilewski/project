@@ -19,10 +19,10 @@
         }
 
         function save(profile, photo) {
-            console.log('Done parsing form!', profile, photo);
-            db.putUser(profile).then(function (pro) {
+            console.info('Saving user profile data.', profile, photo);
+            return db.putUser(profile).then(function (pro) {
                 if (photo) {
-                    db.db.putAttachment(pro.id, "profilowe", pro.rev, photo, "image/png");
+                    return db.db.putAttachment(pro.id, "profilowe", pro.rev, photo, "image/png");
                 }
             });
 
