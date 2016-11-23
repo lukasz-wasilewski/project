@@ -3,9 +3,9 @@
 
     angular.module('myApp').factory('Profiles', Profiles);
 
-    Profiles.$inject = ['$http', 'toastr'];
+    Profiles.$inject = ['$http', 'toastr', 'Torrent'];
 
-    function Profiles($http, toastr) {
+    function Profiles($http, toastr, Torrent) {
         var db = require('./db');
         
         return {
@@ -22,7 +22,12 @@
             console.info('Saving user profile data.', profile, photo);
             return db.putUser(profile).then(function (pro) {
                 if (photo) {
-                    return db.db.putAttachment(pro.id, "profilowe", pro.rev, photo, "image/png");
+                    return db.db.putAttachment(pro.id, "profilowe", pro.rev, photo, "image/png")
+                    .then(function(){
+                        Torrent.share();
+                    });
+                } else {
+                    Torrent.share();
                 }
             });
 

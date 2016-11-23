@@ -21,7 +21,7 @@
         Profiles.get()
             .then(function (data) {
                 for (var i = 0; i < data.length; i++) {
-                    data[i].photo = nativeImage.createFromBuffer(data[i].doc._attachments["profilowe"].data);
+                    data[i].photo = data[i].doc._attachments === undefined ? null : nativeImage.createFromBuffer(data[i].doc._attachments["profilowe"].data);
                 }
                 $scope.friends_list = data;
                 $scope.$apply();
@@ -33,13 +33,14 @@
         $scope.get = function () {
             ctrl.progress = true;
             Torrent.runConsume($scope.search_id)
-                /*
-                                setTimeout(function () {
+            .then(function () {
                                     toastr.success('Dodano znajomego');
                                     ctrl.progress = false;
                                     $state.reload();
-                                }, 10000)
-                */
+            }, function(){
+                ctrl.progress = false;
+                toastr.error('Nie znaleziono uzytkownika');
+            });
         };
     }
 })();

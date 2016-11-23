@@ -16,7 +16,8 @@
     function ProfilUzytkownikaCtrl(Profiles, $http, toastr, $state) {
         var ctrl = this;
         ctrl.saveProfile = function () {
-            Profiles.save(ctrl.profile, ctrl.photo.toPNG())
+            let photo = ctrl.photo === undefined ? null : ctrl.photo.toPNG();
+            Profiles.save(ctrl.profile, photo)
                 .then(function () {
                     toastr.success('Profil zapisano');
                     ctrl.post.info = ctrl.profile.full_name;

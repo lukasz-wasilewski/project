@@ -7,7 +7,7 @@
     var db = require('./db');
 
     class Torrent {
-        constructor() {
+        constructor($q) {
             this.clientSeed = new WebTorrent({
                 dht: {
                     verify: ed.verify
@@ -18,10 +18,12 @@
                     verify: ed.verify
                 }
             });
+            this.$q = $q;
         }
+        static get $inject(){ return ["$q"]; }
 
 
-        getTorrent(infoHash) {
+        getTorrent(infoHash, download) {
             var self = this;
             var magnetURI = `magnet:?xt=urn:btih:${infoHash}&tr=udp%3A%2F%2Fexodus.desync.com%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com`;
 
@@ -49,6 +51,8 @@
                         }).catch(function () {
                             delete temp.profile._rev;
                             db.db.put(temp.profile);
+                        }).then(function(){
+                            download.resolve();
                         });
 
                         db.getPost(temp.profile._id).then(function (p) {
@@ -178,7 +182,7 @@
 
 
             })
-
+            
         }
 
         runConsume(publicKey) {
@@ -193,25 +197,28 @@
             })
 
             var dht = client.dht;
-
+            let download = self.$q.defer();
             console.log('connecting to DHT... ')
-            return dht.on('ready', function () {
+            dht.on('ready', function () {
 
                 console.log('looking up target ID ' + targetID + ' ... ')
 
-                return dht.get(targetID, function (err, res) {
+                dht.get(targetID, function (err, res) {
                     if (err || !res) {
                         console.error('{red:not found}')
+                        download.reject();
                         client.destroy();
                     } else {
                         var magnetURI = res.v.ih.toString('hex');
                         console.info(`Get torrent infoHash ${magnetURI} for user id ${targetID}`)
                         client.destroy();
-                        return self.getTorrent(magnetURI);
+                        self.getTorrent(magnetURI, download);
                     }
                 })
 
             })
+            
+            return download.promise;
         }
     }
 
